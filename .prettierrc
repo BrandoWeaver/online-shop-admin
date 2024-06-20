@@ -1,0 +1,22 @@
+{
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "tabWidth": 2,
+  "printWidth": 80,
+
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": [
+    "^@mui/(.*)$",
+    "^contexts/(.*)$",
+    "^routes/(.*)$",
+    "^api/(.*)$",
+    "^layouts/(.*)$",
+    "^components/(.*)$",
+    "^hooks/(.*)$",
+    "^utils/(.*)$",
+    "^themes",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}
