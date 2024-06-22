@@ -36,34 +36,34 @@ export const menuItems = [
     icon: <MdOutlineLocalMall size={30} />,
     path: ROUTE_PATH.product,
   },
-  {
-    title: 'Account',
-    icon: <MdPersonOutline />,
-    path: ROUTE_PATH.account,
-    custom: (key: number, matched: boolean, onClick: () => void) => (
-      <Fragment key={key}>
-        <Stack flexGrow={1} sx={{ display: { xs: 'none', md: 'flex' } }} />
-        <Stack
-          justifyContent='center'
-          alignItems='center'
-          my={3}
-          sx={{ display: { xs: 'none', md: 'flex' } }}
-        >
-          <IconButton
-            size='large'
-            sx={{
-              border: '1px solid',
-              borderColor: !matched ? 'divider' : 'primary.main',
-              color: !matched ? 'text.secondary' : 'primary.main',
-            }}
-            onClick={onClick}
-          >
-            <MdPersonOutline />
-          </IconButton>
-        </Stack>
-      </Fragment>
-    ),
-  },
+  // {
+  //   title: 'Account',
+  //   icon: <MdPersonOutline />,
+  //   path: ROUTE_PATH.account,
+  //   custom: (key: number, matched: boolean, onClick: () => void) => (
+  //     <Fragment key={key}>
+  //       <Stack flexGrow={1} sx={{ display: { xs: 'none', md: 'flex' } }} />
+  //       <Stack
+  //         justifyContent='center'
+  //         alignItems='center'
+  //         my={3}
+  //         sx={{ display: { xs: 'none', md: 'flex' } }}
+  //       >
+  //         <IconButton
+  //           size='large'
+  //           sx={{
+  //             border: '1px solid',
+  //             borderColor: !matched ? 'divider' : 'primary.main',
+  //             color: !matched ? 'text.secondary' : 'primary.main',
+  //           }}
+  //           onClick={onClick}
+  //         >
+  //           <MdPersonOutline />
+  //         </IconButton>
+  //       </Stack>
+  //     </Fragment>
+  //   ),
+  // },
 ];
 
 interface Props {
@@ -96,7 +96,7 @@ function Menubar(props: Props) {
       <Stack direction={['row', 'row', 'column']} height='inherit'>
         {menuItems.map((menu, i) => {
           const matched = Boolean(menu.path && matchPath(menu.path, pathname));
-          return !menu.custom ? (
+          return (
             <Button
               key={i}
               sx={{
@@ -127,8 +127,6 @@ function Menubar(props: Props) {
               {menu.icon}
               {menu.title}
             </Button>
-          ) : (
-            menu.custom(i, matched, () => navigate(menu.path))
           );
         })}
       </Stack>

@@ -1,14 +1,18 @@
-import { StyledTab, StyledTabs, TabPanel } from 'components/CusMuiComp/CusTabs';
-import { Box } from '@mui/system';
-import { AppBar } from '@mui/material';
-import ShopInfo from './ShopInfo';
-import Payment from './Payment';
-import OperatingHours from './OperatiingHours';
-
-import { useContext, useState } from 'react';
 import { useRequest } from 'ahooks';
-import SHOP from 'api/Shop';
+import { useContext, useState } from 'react';
+
+import { AppBar } from '@mui/material';
+import { Box } from '@mui/system';
+
 import { AuthContext } from 'contexts/AuthContext';
+
+import SHOP from 'api/Shop';
+
+import { StyledTab, StyledTabs, TabPanel } from 'components/CusMuiComp/CusTabs';
+
+import OperatingHours from './OperatiingHours';
+import Payment from './Payment';
+import ShopInfo from './ShopInfo';
 
 function Shop() {
   // const [open, setOpen] = useState(false);
@@ -23,7 +27,7 @@ function Shop() {
       onError: () => {
         // setOpen(true);
       },
-    }
+    },
   );
 
   // console.log("Data", data);
@@ -49,10 +53,10 @@ function Shop() {
               label='Payment'
               sx={{ flex: 1, maxWidth: '50px', py: 1 }}
             />
-            <StyledTab
+            {/* <StyledTab
               label='Operating Hours'
               sx={{ flex: 1, maxWidth: '50px', py: 1 }}
-            />
+            /> */}
           </StyledTabs>
         </>
       </AppBar>

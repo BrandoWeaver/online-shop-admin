@@ -1,7 +1,10 @@
 import Box from '@mui/material/Box';
-import { StyledTabs, StyledTab, TabPanel } from 'components/CusMuiComp/CusTabs';
-import ProductTab from './ProductTab';
+
+import { StyledTab, StyledTabs, TabPanel } from 'components/CusMuiComp/CusTabs';
+
 import useRouter, { ROUTE_PATH } from 'hooks/useRouter';
+
+import ProductTab from './ProductTab';
 
 const Product = () => {
   const { urlParams, navigate } = useRouter();
@@ -25,7 +28,7 @@ const Product = () => {
         }
       >
         <StyledTab label='Product' value='product' />
-        <StyledTab label='Banner' value='banner' />
+        {/* <StyledTab label='Banner' value='banner' /> */}
       </StyledTabs>
       {/* </AppBar> */}
 

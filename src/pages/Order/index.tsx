@@ -41,11 +41,9 @@ import OrderPage from './OrderDetail/Order/pageOrder';
 import DataHistory from './OrderSumary/History';
 
 const activeOrderStatus = [
-  { label: 'Review', value: 'review' },
   { label: 'Pending', value: 'pending' },
-  { label: 'Confirmed', value: 'confirmed' },
-  { label: 'Await Pickup', value: 'waiting_driver' },
   { label: 'Delivering', value: 'delivering,delivering_province' },
+  { label: 'Confirmed', value: 'confirmed' },
 ];
 
 const historyOrderStatus = [

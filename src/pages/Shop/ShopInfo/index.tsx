@@ -1,4 +1,14 @@
-import Button from "@mui/material/Button";
+import ErrorResponse from 'ErrorRespone';
+import { useRequest } from 'ahooks';
+import CustomizedTables from 'pages/Shop/ShopInfo/TableView';
+import { useState } from 'react';
+import {
+  Controller,
+  FormProvider,
+  SubmitHandler,
+  useForm,
+} from 'react-hook-form';
+
 import {
   Avatar,
   CircularProgress,
@@ -10,26 +20,19 @@ import {
   Grid,
   Stack,
   Typography,
-} from "@mui/material";
+} from '@mui/material';
+import Button from '@mui/material/Button';
+import { Box } from '@mui/system';
 
-import { Box } from "@mui/system";
-import { useState } from "react";
-import theme from "themes";
+import { BackdropLoading } from 'components/Loading';
 
-import {
-  Controller,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from "react-hook-form";
-import CustomizedTables from "pages/Shop/ShopInfo/TableView";
-import { useRequest } from "ahooks";
-import { ROUTE_API } from "utils/route-util";
-import HttpUtil from "utils/http-util";
-import Edit from "./Edit";
-import ChangeColor from "./ChangeColor";
-import { BackdropLoading } from "components/Loading";
-import ErrorResponse from "ErrorRespone";
+import HttpUtil from 'utils/http-util';
+import { ROUTE_API } from 'utils/route-util';
+
+import theme from 'themes';
+
+import ChangeColor from './ChangeColor';
+import Edit from './Edit';
 
 interface Iform {
   SellerName: string;
@@ -99,8 +102,8 @@ function ShopInfo(props: Ishop) {
   } = useRequest(
     async (data) =>
       await HttpUtil.post(
-        ROUTE_API.updateShopInfo.replace(":id", `${props.id}`),
-        data
+        ROUTE_API.updateShopInfo.replace(':id', `${props.id}`),
+        data,
       ),
     {
       manual: true,
@@ -111,7 +114,7 @@ function ShopInfo(props: Ishop) {
       onError: () => {
         setOpen(true);
       },
-    }
+    },
   );
 
   const {
@@ -126,34 +129,34 @@ function ShopInfo(props: Ishop) {
     {
       manual: true,
       onSuccess: () => {
-        console.log("Success");
+        console.log('Success');
       },
-    }
+    },
   );
 
   const onSubmit: SubmitHandler<Iform> = async (data) => {
     try {
       const formData = new FormData();
-      formData.append("name", data.SellerName);
-      formData.append("tagline", data.tagline);
-      formData.append("domain", data.domain);
-      formData.append("telegramId", data.telgroup);
-      formData.append("addr", data.addr);
-      formData.append("poi", data.poi);
-      formData.append("location[lat]", data.lati.toString());
-      formData.append("location[lng]", data.long.toString());
-      formData.append("contact[phone1]", data.con1);
-      formData.append("contact[phone2]", data.con2);
-      formData.append("lang", data.lang);
+      formData.append('name', data.SellerName);
+      formData.append('tagline', data.tagline);
+      formData.append('domain', data.domain);
+      formData.append('telegramId', data.telgroup);
+      formData.append('addr', data.addr);
+      formData.append('poi', data.poi);
+      formData.append('location[lat]', data.lati.toString());
+      formData.append('location[lng]', data.long.toString());
+      formData.append('contact[phone1]', data.con1);
+      formData.append('contact[phone2]', data.con2);
+      formData.append('lang', data.lang);
       // formData.append("primaryColor", data?.primaryColor);
       // formData.append("secondaryColor", data?.secondaryColor);
-      formData.append("facebookPageId", data.faceId);
-      formData.append("mapUrl", data.map);
+      formData.append('facebookPageId', data.faceId);
+      formData.append('mapUrl', data.map);
       // formData.append("logoFile", data.img);
       // formData.append("shopCategory", data.shopCate);
       updateShop(formData);
     } catch (err) {
-      console.log("Error:", err);
+      console.log('Error:', err);
     }
   };
   const handleClose = () => {
@@ -179,8 +182,8 @@ function ShopInfo(props: Ishop) {
         <Box
           marginTop={{ xs: 12, md: 25 }}
           sx={{
-            display: "flex",
-            justifyContent: "center",
+            display: 'flex',
+            justifyContent: 'center',
           }}
         >
           <ErrorResponse
@@ -188,9 +191,9 @@ function ShopInfo(props: Ishop) {
               props.shopError?.error_description ||
               props.shopError?.message ||
               props.shopError?.error ||
-              "Someting went wrong"
+              'Someting went wrong'
             }
-            buttonText="refresh"
+            buttonText='refresh'
             buttonAction={props.refresh}
           />
         </Box>
@@ -200,13 +203,13 @@ function ShopInfo(props: Ishop) {
             open={open}
             onClose={handleClose}
             fullWidth={true}
-            maxWidth={"xs"}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
+            maxWidth={'xs'}
+            aria-labelledby='alert-dialog-title'
+            aria-describedby='alert-dialog-description'
           >
-            <DialogTitle id="alert-dialog-title">Error Occured</DialogTitle>
+            <DialogTitle id='alert-dialog-title'>Error Occured</DialogTitle>
             <DialogContent>
-              <DialogContentText id="alert-dialog-description">
+              <DialogContentText id='alert-dialog-description'>
                 {updateError?.error ||
                   updateError?.message ||
                   updateError?.error_description}
@@ -226,9 +229,9 @@ function ShopInfo(props: Ishop) {
                 xs={4}
                 md={2}
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
                 }}
               >
                 <Avatar
@@ -236,95 +239,24 @@ function ShopInfo(props: Ishop) {
                   sx={{
                     width: { xs: 100, md: 120 },
                     height: { xs: 100, md: 120 },
-                    boxShadow: "0px 0px 2px 0px",
-                    border: "6px solid white",
+                    boxShadow: '0px 0px 2px 0px',
+                    border: '6px solid white',
                   }}
-                  src={props.logo}
+                  src={`/images/logo.png`}
                 />
-                <Controller
-                  render={({ field: { onChange, value } }) => (
-                    <Button
-                      variant="text"
-                      component="label"
-                      size="small"
-                      sx={{
-                        // minWidth: "100px",
-                        fontSize: {
-                          xs: "body2.fontSize",
-                          md: "body1.fontSize",
-                        },
-                        width: { xs: 120, md: 150 },
-                      }}
-                    >
-                      Change Logo
-                      <input
-                        style={{ height: "100%" }}
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        onChange={(e) => {
-                          if (e.target.value.length) {
-                            onChange(e.target.files?.[0]);
-                          }
-                          const file = e.target.files?.[0];
-                          const formData: any = new FormData();
-                          formData.append("logoFile", file, file?.name);
-                          updateShop(formData);
-                        }}
-                      />
-                    </Button>
-                  )}
-                  name="img"
-                  control={control}
-                />
-              </Grid>
-
-              <Grid
-                item
-                xs={8}
-                md={10}
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
                 <Typography
-                  variant="h5"
-                  fontWeight={"bold"}
+                  variant='h5'
+                  fontWeight={'bold'}
                   sx={{
-                    fontSize: { xs: "body2.fontSize", md: "body1.fontSize" },
+                    fontSize: { xs: 'body2.fontSize', md: 'body1.fontSize' },
+                    mt: 1,
                   }}
                 >
-                  {props.name}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: { xs: "body2.fontSize", md: "body1.fontSize" },
-                  }}
-                >
-                  {props.domain + ".dogenote.shop"}
+                  Online Shop
                 </Typography>
               </Grid>
             </Grid>
           </Box>
-          <Box
-            sx={{ background: theme.palette.background.paper, py: 2, pl: 2 }}
-          >
-            <Typography
-              sx={{ fontSize: { xs: "body2.fontSize", md: "body1.fontSize" } }}
-              fontWeight={"bold"}
-            >
-              Brand Colors
-            </Typography>
-          </Box>
-          <FormProvider {...method}>
-            <ChangeColor
-              primaryColor={props.primaryColor}
-              secondaryColor={props.secondaryColor}
-              run={updateShop}
-              loading={updateLoading}
-            />
-          </FormProvider>
 
           {edit === true ? (
             <>
@@ -354,35 +286,35 @@ function ShopInfo(props: Ishop) {
               </FormProvider>
               <Stack
                 sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "flex-end",
-                  paddingBottom: "30px",
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
+                  paddingBottom: '30px',
                 }}
               >
                 <Button
                   disabled={updateLoading}
                   sx={{ mr: 2 }}
-                  color="error"
-                  type="submit"
+                  color='error'
+                  type='submit'
                   onClick={() => setEdit(false)}
                 >
                   Cancel
                 </Button>
                 <Button
                   disabled={updateLoading}
-                  variant="contained"
-                  color="primary"
-                  type="submit"
+                  variant='contained'
+                  color='primary'
+                  type='submit'
                   onClick={() => {
                     setEdit(true);
                     method.handleSubmit(onSubmit)();
                   }}
                 >
                   {updateLoading ? (
-                    <CircularProgress size={24} color="primary" />
+                    <CircularProgress size={24} color='primary' />
                   ) : (
-                    "Save"
+                    'Save'
                   )}
                 </Button>
               </Stack>
@@ -415,19 +347,19 @@ function ShopInfo(props: Ishop) {
           {edit === false && (
             <div
               style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                paddingBottom: "30px",
+                display: 'flex',
+                justifyContent: 'flex-end',
+                paddingBottom: '30px',
               }}
             >
-              <Button
+              {/* <Button
                 onClick={() => {
                   setEdit(true);
                 }}
-                variant="contained"
+                variant='contained'
               >
                 Edit
-              </Button>
+              </Button> */}
             </div>
           )}
         </Box>

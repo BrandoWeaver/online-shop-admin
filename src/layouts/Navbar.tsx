@@ -1,35 +1,34 @@
-import { memo, useRef, useState } from "react";
-
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
-import { Link } from "react-router-dom";
-
-import { matchPath, useLocation } from "react-router";
-import {
-  Avatar,
-  Breadcrumbs,
-  Divider,
-  Link as MuiLink,
-  Tooltip,
-} from "@mui/material";
+import { memo, useRef, useState } from 'react';
 import {
   MdArrowDropDown,
   MdCheck,
   MdChevronRight,
   MdLogout,
   MdOutlineHome,
-} from "react-icons/md";
+} from 'react-icons/md';
+import { matchPath, useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 
-import { useAuthContext } from "contexts/AuthContext";
+import {
+  Avatar,
+  Breadcrumbs,
+  Divider,
+  Link as MuiLink,
+  Tooltip,
+} from '@mui/material';
+import AppBar from '@mui/material/AppBar';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 
-import ConfDialog, { IConfDialogRef } from "components/Dialog/ConfDialog";
+import { useAuthContext } from 'contexts/AuthContext';
 
-import { ROUTE_PATH } from "utils/route-util";
+import ConfDialog, { IConfDialogRef } from 'components/Dialog/ConfDialog';
 
-import { menuItems } from "./Menubar";
+import { ROUTE_PATH } from 'utils/route-util';
+
+import { menuItems } from './Menubar';
 
 interface Props {
   /**
@@ -49,7 +48,7 @@ function Navbar({ drawerWidth }: Props) {
   const logoutRef = useRef<IConfDialogRef>(null);
 
   const matched = menuItems.find((menu) =>
-    Boolean(matchPath(menu.path, pathname))
+    Boolean(matchPath(menu.path, pathname)),
   );
 
   const onConfirmLogout = () => {
@@ -59,8 +58,8 @@ function Navbar({ drawerWidth }: Props) {
   return (
     <AppBar
       elevation={0}
-      position="fixed"
-      color="default"
+      position='fixed'
+      color='default'
       sx={{
         width: { sm: `calc(100% - ${drawerWidth}px)` },
         ml: { sm: `${drawerWidth}px` },
@@ -76,27 +75,27 @@ function Navbar({ drawerWidth }: Props) {
 
       <Toolbar sx={{ height: [80, 80, 100] }}>
         <Stack>
-          <Typography variant="h6" fontWeight={600} gutterBottom>
-            {matched?.title === "Home" ? "Dashboard" : matched?.title}
+          <Typography variant='h6' fontWeight={600} gutterBottom>
+            {matched?.title === 'Home' ? 'Dashboard' : matched?.title}
           </Typography>
-          {matched?.title !== "Home" && (
+          {matched?.title !== 'Home' && (
             <Breadcrumbs
               separator={<MdChevronRight />}
-              sx={{ display: { xs: "none", md: "block" } }}
+              sx={{ display: { xs: 'none', md: 'block' } }}
             >
               <MuiLink
                 component={Link}
-                underline="hover"
-                color="inherit"
+                underline='hover'
+                color='inherit'
                 to={ROUTE_PATH.home}
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                 }}
               >
                 <MdOutlineHome size={18} />
               </MuiLink>
-              <Typography color="text.primary">{matched?.title}</Typography>
+              <Typography color='text.primary'>{matched?.title}</Typography>
             </Breadcrumbs>
           )}
         </Stack>
@@ -109,21 +108,21 @@ function Navbar({ drawerWidth }: Props) {
           slotProps={{
             tooltip: {
               sx: {
-                p: 0,
+                // p: 0,
                 minWidth: 180,
-                bgcolor: "common.white",
-                color: "common.black",
+                bgcolor: 'common.white',
+                color: 'common.black',
                 boxShadow: 2,
               },
             },
           }}
           title={
             <Stack>
-              {sellerInfo?.shops.map((sh) => (
+              {/* {sellerInfo?.shops.map((sh) => (
                 <Button
-                  color={selectedShop?.id === sh.id ? "primary" : "inherit"}
+                  color={selectedShop?.id === sh.id ? 'primary' : 'inherit'}
                   key={sh.id}
-                  size="large"
+                  size='large'
                   onClick={() => {
                     setAuthState((prev) => ({
                       ...prev,
@@ -134,21 +133,21 @@ function Navbar({ drawerWidth }: Props) {
                 >
                   <Avatar
                     src={sh.logo}
-                    imgProps={{ loading: "lazy" }}
-                    sx={{ width: 30, height: 30, bgcolor: "divider", mr: 1 }}
+                    imgProps={{ loading: 'lazy' }}
+                    sx={{ width: 30, height: 30, bgcolor: 'divider', mr: 1 }}
                   />
-                  <Typography align="left" variant="body2" sx={{ flexGrow: 1 }}>
+                  <Typography align='left' variant='body2' sx={{ flexGrow: 1 }}>
                     {sh.name}
                   </Typography>
                   {selectedShop?.id === sh.id && <MdCheck />}
                 </Button>
-              ))}
-              <Divider />
+              ))} */}
+              {/* <Divider /> */}
               <Button
-                size="large"
-                color="error"
+                size='large'
+                color='error'
                 startIcon={<MdLogout />}
-                onClick={() => logoutRef.current?.open("Logout")}
+                onClick={() => logoutRef.current?.open('Logout')}
               >
                 Logout
               </Button>
@@ -156,20 +155,15 @@ function Navbar({ drawerWidth }: Props) {
           }
         >
           <Button
-            variant="contained"
-            color="inherit"
+            variant='contained'
+            color='inherit'
             startIcon={
-              <Avatar
-                src={selectedShop?.logo}
-                imgProps={{ loading: "lazy" }}
-                sx={{ bgcolor: "divider" }}
-              />
+              <Avatar src={`/images/logo.png`} sx={{ bgcolor: 'divider' }} />
             }
-            endIcon={<MdArrowDropDown />}
             sx={{
               borderRadius: 2,
-              bgcolor: "background.paper",
-              ":hover": { bgcolor: "grey.200" },
+              bgcolor: 'background.paper',
+              ':hover': { bgcolor: 'grey.200' },
             }}
             onClick={() => setOpen((prev) => !prev)}
           >
