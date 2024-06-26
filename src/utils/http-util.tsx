@@ -1,6 +1,7 @@
-import Axios from "axios";
-import { getPersistedState, getPersistedStateSession } from "./persist-util";
-import { ROUTE_API } from "./route-util";
+import Axios from 'axios';
+
+import { getPersistedState, getPersistedStateSession } from './persist-util';
+import { ROUTE_API } from './route-util';
 
 const HttpUtil = Axios.create({
   baseURL: ROUTE_API.root,
@@ -12,11 +13,11 @@ HttpUtil.interceptors.request.use(async (config) => {
     getPersistedStateSession(process.env.REACT_APP_PERSIST_AUTH) ||
     {};
 
-  config.headers.Authorization = persistedState.access_token
-    ? `Bearer ${persistedState?.access_token}`
-    : "";
+  config.headers.Authorization = persistedState.token
+    ? `Bearer ${persistedState?.token}`
+    : '';
 
-  config.headers.Accept = "*/*";
+  config.headers.Accept = '*/*';
   return config;
 });
 
@@ -29,7 +30,7 @@ HttpUtil.interceptors.response.use(
   },
   function (err) {
     const res = err.response;
-    console.log("Res:", res);
+    console.log('Res:', res);
     if (res) {
       if (res?.status === 401) {
         localStorage.clear();
@@ -40,7 +41,7 @@ HttpUtil.interceptors.response.use(
     } else {
       return Promise.reject(err);
     }
-  }
+  },
 );
 
 export default HttpUtil;

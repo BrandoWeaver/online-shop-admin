@@ -25,8 +25,6 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 
-import { AuthContext } from 'contexts/AuthContext';
-
 import ORDER from 'api/Order';
 
 import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
@@ -70,7 +68,7 @@ interface IaddProduct {
 
 function AddNewProduct(props: IaddProduct) {
   const errRef = useRef<IErrDialogRef>(null);
-  const { selectedShop } = React.useContext(AuthContext);
+  // const { selectedShop } = React.useContext(AuthContext);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [productId, setProductId] = useState<number[]>([]);
@@ -97,13 +95,7 @@ function AddNewProduct(props: IaddProduct) {
     refresh: refreshListProduct,
     loading: loadingListProduct,
   } = useRequest(
-    () =>
-      ORDER.getListProduct(
-        `${selectedShop?.id}`,
-        page,
-        debouncedSearch,
-        rowsPerPage,
-      ),
+    () => ORDER.getListProduct(`${1}`, page, debouncedSearch, rowsPerPage),
     {
       onError: (e) => {},
       refreshDeps: [page, rowsPerPage, debouncedSearch, formState.isSubmitting],
@@ -122,10 +114,8 @@ function AddNewProduct(props: IaddProduct) {
   };
 
   const { run: addOrderProduct } = useRequest(
-    () =>
-      ORDER.addProductOrder(`${selectedShop?.id}`, props.orderId, productId),
+    () => ORDER.addProductOrder(`${1}`, props.orderId, productId),
     {
-      refreshDeps: [selectedShop?.id],
       manual: true,
       onSuccess: (data) => {
         props.refresh();
@@ -274,7 +264,7 @@ function AddNewProduct(props: IaddProduct) {
                     ))}
                   </TableRow>
                 </TableHead>
-                <TableBody>
+                {/* <TableBody>
                   {listProduct?.data?.map((task) => {
                     return (
                       <TableRow role='checkbox' tabIndex={-1} key={task.id}>
@@ -297,7 +287,7 @@ function AddNewProduct(props: IaddProduct) {
                       </TableRow>
                     );
                   })}
-                </TableBody>
+                </TableBody> */}
               </Table>
             </TableContainer>
           )

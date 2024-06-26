@@ -4,28 +4,26 @@ import { MdDone } from 'react-icons/md';
 
 import { Button, Grid, Paper } from '@mui/material';
 
-import { AuthContext } from 'contexts/AuthContext';
-
 import ORDER from 'api/Order';
 
 import ConfirmDialog from 'components/Dialog/ConfirmDialog';
 import ErrorDialog from 'components/Dialog/ErrorDialog';
 
 interface Iconfirm {
-  id: number | undefined;
+  id: string | undefined;
   refreshOrderList: () => void;
   setOrder: React.Dispatch<React.SetStateAction<string>>;
   refreshListDetail: () => void;
-  setId: React.Dispatch<React.SetStateAction<number>>;
+  setId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 function ConfrimBtn(prop: Iconfirm) {
   const [open, setOpen] = useState(false);
-  const { selectedShop } = React.useContext(AuthContext);
+  // const { selectedShop } = React.useContext(AuthContext);
   const [errOpen, setOpenErr] = useState(false);
   const { run: runManageDelivery, error: errMangeDelivery } = useRequest(
     () =>
-      ORDER.runRejectOrder(`${selectedShop?.id}`, prop.id, 'completed', [
+      ORDER.runRejectOrder(`${1}`, prop.id, 'completed', [
         'manage own delivery',
       ]),
     {
@@ -35,7 +33,7 @@ function ConfrimBtn(prop: Iconfirm) {
         setOpen(false);
         prop.setOrder('order');
         prop.refreshListDetail();
-        prop.setId(-1);
+        prop.setId('');
       },
       onError: () => {
         setOpenErr(true);

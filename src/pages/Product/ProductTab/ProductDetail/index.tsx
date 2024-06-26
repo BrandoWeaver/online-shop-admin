@@ -1,19 +1,16 @@
-import { memo, useEffect, useRef, useState } from 'react';
 import { useRequest } from 'ahooks';
+import { memo, useRef, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import { Box, Button, Stack } from '@mui/material';
 
 import { PRODUCT_API } from 'api/Product';
 
-import { useAuthContext } from 'contexts/AuthContext';
-import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
 import { StyledTab, StyledTabs } from 'components/CusMuiComp/CusTabs';
+import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
 
 import DetailView from './DetailTab/DetailView';
 import ProductForm from './DetailTab/ProForm';
-
-import VariantsView from './VariantsTab';
 
 export interface IProductForm
   extends Omit<IProduct.ICreateProData, 'videoFile' | 'thumbnailFile'> {
@@ -53,55 +50,51 @@ const ProductDetail = ({
 
   const [active, setActive] = useState(0);
 
-  const { selectedShop } = useAuthContext();
-
   const {
     data: productDetail,
-    run: runGetProDetail,
     loading: loadingGetProDetail,
     error: errGetProDetail,
     refresh: refreshProDetail,
-    mutate: mutateProductDetail,
   } = useRequest(PRODUCT_API.getProductDetail, {
     manual: true,
-    ready: Boolean(selectedShop?.id && selectPro !== 'new'),
+    // ready: Boolean(1 && selectPro !== 'new'),
     onSuccess(data) {
       // console.log('getProductDetail onSuccess:', data);
     },
   });
 
-  const { run: runAddNewProduct, loading: loadingAddNewProduct } = useRequest(
-    PRODUCT_API.addNewProduct,
-    {
-      manual: true,
-      ready: selectPro === 'new',
-      onSuccess: (data) => {
-        // console.log('addNewProduct onSuccess:', data);
-        refreshListCate();
-        setSelectCate(+data.categoryId);
-        setSelectPro(data.id);
-        setEdit(false);
-      },
-      onError: (err) => errAlert.current?.open(err),
-    }
-  );
+  // const { run: runAddNewProduct, loading: loadingAddNewProduct } = useRequest(
+  //   PRODUCT_API.addNewProduct,
+  //   {
+  //     manual: true,
+  //     ready: selectPro === 'new',
+  //     onSuccess: (data) => {
+  //       // console.log('addNewProduct onSuccess:', data);
+  //       refreshListCate();
+  //       setSelectCate(+data.categoryId);
+  //       setSelectPro(data.id);
+  //       setEdit(false);
+  //     },
+  //     onError: (err) => errAlert.current?.open(err),
+  //   },
+  // );
 
-  const { run: runEditProduct, loading: loadingEditProduct } = useRequest(
-    PRODUCT_API.editProduct,
-    {
-      manual: true,
-      ready: selectPro !== 'new',
-      onSuccess: (data) => {
-        // console.log('editProduct onSuccess:', data);
-        setEdit(false);
-        refreshListCate();
-        setSelectCate(+data.categoryId);
-        setSelectPro(data.id);
-        mutateProductDetail(data);
-      },
-      onError: (err) => errAlert.current?.open(err),
-    }
-  );
+  // const { run: runEditProduct, loading: loadingEditProduct } = useRequest(
+  //   PRODUCT_API.editProduct,
+  //   {
+  //     manual: true,
+  //     ready: selectPro !== 'new',
+  //     onSuccess: (data) => {
+  //       // console.log('editProduct onSuccess:', data);
+  //       setEdit(false);
+  //       refreshListCate();
+  //       setSelectCate(+data.categoryId);
+  //       setSelectPro(data.id);
+  //       mutateProductDetail(data);
+  //     },
+  //     onError: (err) => errAlert.current?.open(err),
+  //   },
+  // );
 
   // console.log('productDetail:', productDetail);
   // console.log('errGetProDetail:', errGetProDetail);
@@ -116,41 +109,6 @@ const ProductDetail = ({
     ...data
   }) => {
     console.log('onSubmit', data);
-    if (selectedShop && selectCate) {
-      if (selectPro === 'new') {
-        runAddNewProduct(selectedShop?.id, {
-          ...data,
-          afterDiscount: discount ? data.afterDiscount : data.price,
-          qty: '999999',
-          unit: 'pcs',
-          // categoryId: selectCate.toString(),
-          ...(thumbnailFile &&
-            typeof thumbnailFile !== 'string' && {
-              thumbnailFile,
-            }),
-          ...(videoFile &&
-            typeof videoFile !== 'string' && {
-              videoFile,
-            }),
-        });
-      } else {
-        runEditProduct(selectedShop?.id, {
-          ...data,
-          id: selectPro,
-          afterDiscount: discount ? data.afterDiscount : data.price,
-          qty: '999999',
-          unit: 'pcs',
-          ...(thumbnailFile &&
-            typeof thumbnailFile !== 'string' && {
-              thumbnailFile,
-            }),
-          ...(videoFile &&
-            typeof videoFile !== 'string' && {
-              videoFile,
-            }),
-        });
-      }
-    }
   };
 
   const onCancelClick = () => {
@@ -159,50 +117,6 @@ const ProductDetail = ({
     }
     setEdit(false);
   };
-
-  useEffect(() => {
-    if (selectedShop && selectPro !== 'new') {
-      runGetProDetail(selectedShop?.id, selectPro);
-    } else if (selectPro === 'new') {
-      setEdit(true);
-      methods.setValue('name', 'New Product');
-      methods.setValue('thumbnailFile', '');
-      methods.setValue('desc', '');
-      methods.setValue('price', '');
-      methods.setValue('discount', false);
-      methods.setValue('afterDiscount', '');
-      methods.setValue('categoryId', selectCate?.toString() || '');
-      methods.setValue('inventoryStatus', '');
-      methods.setValue('videoFile', '');
-      methods.setValue('productMedias', []);
-    } // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectPro, selectedShop]);
-
-  useEffect(() => {
-    if (edit && productDetail && productDetail.id === selectPro) {
-      methods.setValue('name', productDetail.name);
-      methods.setValue('thumbnailFile', productDetail?.thumbnail || '');
-      methods.setValue('desc', productDetail.desc);
-      methods.setValue('price', (+(productDetail.price || 0)).toFixed(2));
-      if (productDetail.price !== productDetail.afterDiscount) {
-        methods.setValue('discount', true);
-      } else {
-        methods.setValue('discount', false);
-      }
-      methods.setValue(
-        'afterDiscount',
-        (+(productDetail.afterDiscount || 0)).toFixed(2)
-      );
-      methods.setValue('categoryId', productDetail.categoryId.toString());
-      methods.setValue('inventoryStatus', productDetail.inventoryStatus);
-      methods.setValue('videoFile', productDetail?.video || '');
-      methods.setValue('photoFiles', []);
-      methods.setValue('productMedias', productDetail?.productMedias || []);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [edit, productDetail]);
-
-  const isLoading = loadingEditProduct || loadingAddNewProduct;
 
   return (
     <>
@@ -265,7 +179,7 @@ const ProductDetail = ({
                     ? {
                         ...productDetail,
                         categoryName: allCategory?.find(
-                          (cate) => cate.id === productDetail?.categoryId
+                          (cate) => cate.id === productDetail?.categoryId,
                         )?.name,
                       }
                     : undefined,
@@ -288,17 +202,12 @@ const ProductDetail = ({
               </Button>
             ) : (
               <>
-                <Button
-                  onClick={onCancelClick}
-                  disabled={isLoading}
-                  sx={{ minWidth: 100 }}
-                >
+                <Button onClick={onCancelClick} sx={{ minWidth: 100 }}>
                   Cancel
                 </Button>
                 <Button
                   onClick={methods.handleSubmit(onSubmit)}
                   variant='contained'
-                  disabled={isLoading}
                   sx={{ minWidth: 100 }}
                 >
                   Save
@@ -309,20 +218,20 @@ const ProductDetail = ({
         </>
       )}
 
-      {active === 1 && (
+      {/* {active === 1 && (
         <>
-          {selectedShop && selectPro !== 'new' && productDetail && (
+         
             <VariantsView
               edit={edit}
               proId={selectPro}
-              shopId={selectedShop?.id}
+              shopId={1}
               basePrice={+productDetail?.afterDiscount}
               onEditClick={() => setEdit(true)}
               onCancelClick={() => setEdit(false)}
             />
-          )}
+          
         </>
-      )}
+      )} */}
 
       {/* <Box sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}>
         <TabPanel value={active} index={0}>
@@ -355,7 +264,7 @@ const ProductDetail = ({
             <VariantsView
               edit={edit}
               proId={selectPro}
-              shopId={selectedShop?.id}
+              shopId={1}
               basePrice={+productDetail?.afterDiscount}
             />
           )}

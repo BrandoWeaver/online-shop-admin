@@ -7,17 +7,17 @@ import TopCom from '../OrderID';
 import StepperTracking from './Stepper';
 
 interface Itrack {
-  detailId: number | undefined;
+  detailId: string | undefined;
   status: string | undefined;
   date: string | undefined;
-  orderTracking: Iorder.OrderTracking[];
+  orderTracking: any;
 }
 
 function TrackingPage(prop: Itrack) {
   const [url, setUrl] = useState<string>('');
-  useEffect(() => {
-    prop.orderTracking.map((el) => setUrl(el.url));
-  }, [prop.orderTracking]);
+  // useEffect(() => {
+  //   prop.orderTracking.map((el) => setUrl(el.url));
+  // }, [prop.orderTracking]);
 
   return (
     <Box
@@ -29,7 +29,7 @@ function TrackingPage(prop: Itrack) {
         '::-webkit-scrollbar': { display: 'none' },
       }}
     >
-      <Fade in={prop.detailId !== -1 && true} timeout={500}>
+      <Fade in={prop.detailId !== '' && true} timeout={500}>
         <Grid container>
           <TopCom
             detailId={prop.detailId}

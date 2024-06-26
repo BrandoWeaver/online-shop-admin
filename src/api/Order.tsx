@@ -2,6 +2,29 @@ import HttpUtil from 'utils/http-util';
 import { ROUTE_API } from 'utils/route-util';
 
 const ORDER = {
+  getOrderActive: async () => {
+    const res = await HttpUtil.get<Iorder.IorderAcitve>(
+      ROUTE_API.getOrderActive,
+    );
+    return res.data;
+  },
+  getListOrder: async (status: string) => {
+    const res = await HttpUtil.get<Iorder.IlistOrder>(ROUTE_API.listOrder, {
+      params: {
+        status,
+      },
+    });
+    return res.data;
+  },
+  SummaryOrder: async (startDate?: string, endDate?: string) => {
+    const res = await HttpUtil.get<Iorder.Isummary>(ROUTE_API.summary, {
+      params: {
+        startDate,
+        endDate,
+      },
+    });
+    return res.data;
+  },
   runUpdateAdrr: async (
     shopId: string,
     customerContact: string,
@@ -12,7 +35,7 @@ const ORDER = {
       lng: number;
     },
   ) => {
-    const res = await HttpUtil.post<Iorder.Iaddress>(
+    const res = await HttpUtil.post(
       ROUTE_API.addBuyerAddress
         .replace(':id', shopId.toString())
         .replace(':phone', customerContact),
@@ -28,10 +51,10 @@ const ORDER = {
     shopId: string,
     id: number,
     deliveryOption: string,
-    detailId: number | undefined,
+    detailId: string | undefined,
     zone: string | undefined,
   ) => {
-    const res = await HttpUtil.post<Iorder.Iaddress>(
+    const res = await HttpUtil.post(
       ROUTE_API.updateOrder.replace(':id', shopId.toString()),
       {
         buyerAddressId: id,
@@ -44,51 +67,20 @@ const ORDER = {
     return res.data;
   },
   getOrderInfo: async (shopId: string, orderId: string) => {
-    const res = await HttpUtil.get<Iorder.Datum>(
+    const res = await HttpUtil.get(
       ROUTE_API.orderDetail
         .replace(':id', shopId.toString())
         .replace(':orderId', orderId.toString()),
     );
     return res.data;
   },
-  getListOrder: async (
-    shopId: string,
-    page: number,
-    orderStatus: string,
-    orderType: string,
-  ) => {
-    const res = await HttpUtil.get<Iorder.IlistOrder>(
-      ROUTE_API.orderList.replace(':id', shopId.toString()),
-      {
-        params: {
-          orderType: orderType,
-          orderStatus: orderStatus,
-          page: page + 1,
-        },
+
+  getListHistoryOrder: async (status: string) => {
+    const res = await HttpUtil.get<Iorder.IhistoryOrder>(ROUTE_API.history, {
+      params: {
+        status,
       },
-    );
-    return res.data;
-  },
-  getListHistoryOrder: async (
-    shopId: string,
-    page: number,
-    orderStatus: string,
-    orderType: string,
-    startDate: string,
-    endDate: string,
-  ) => {
-    const res = await HttpUtil.get<Iorder.IlistOrder>(
-      ROUTE_API.orderList.replace(':id', shopId.toString()),
-      {
-        params: {
-          orderType: orderType,
-          orderStatus: orderStatus,
-          page: page + 1,
-          startDate: startDate,
-          endDate: endDate,
-        },
-      },
-    );
+    });
     return res.data;
   },
   getOrderSummary: async (
@@ -97,7 +89,7 @@ const ORDER = {
     endDate: string,
     orderStatus: string,
   ) => {
-    const res = await HttpUtil.get<Iorder.Ihistory>(
+    const res = await HttpUtil.get(
       ROUTE_API.orderHistorySummary.replace(':id', shopId.toString()),
       {
         params: {
@@ -133,7 +125,7 @@ const ORDER = {
   },
 
   runListAddress: async (shopId: string, customerContact: string) => {
-    const res = await HttpUtil.get<Iorder.Iaddress>(
+    const res = await HttpUtil.get(
       ROUTE_API.listBuyerAddress
         .replace(':id', shopId.toString())
         .replace(':phone', customerContact),
@@ -168,7 +160,7 @@ const ORDER = {
     debouncedSearch: string,
     rowsPerPage: number,
   ) => {
-    const res = await HttpUtil.get<Iorder.Ilisproduct>(
+    const res = await HttpUtil.get(
       ROUTE_API.productList.replace(':id', shopId.toString()),
       {
         params: {
@@ -210,7 +202,7 @@ const ORDER = {
   },
   runRejectOrder: async (
     shopId: string,
-    id: number | undefined,
+    id: string | undefined,
     status: string,
     rejectReason: string[],
   ) => {

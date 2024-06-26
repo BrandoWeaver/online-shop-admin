@@ -1,4 +1,9 @@
-import { Avatar, Paper, Stack, Typography, Grid } from '@mui/material';
+import { useRequest } from 'ahooks';
+
+import { Avatar, Grid, Paper, Stack, Typography } from '@mui/material';
+
+import ORDER from 'api/Order';
+import SHOP_PERFORMANCE from 'api/ShopPerformance';
 
 const DashboardItem = ({
   title,
@@ -6,7 +11,7 @@ const DashboardItem = ({
   icon,
 }: {
   title: string;
-  count: number;
+  count: string;
   icon?: string;
 }) => {
   return (
@@ -44,6 +49,20 @@ const DashboardItem = ({
 };
 
 const Home = () => {
+  const { data: dataShopPerformance } = useRequest(
+    SHOP_PERFORMANCE.shopPerformance,
+    {
+      onSuccess: (data) => {
+        console.log('data', data);
+      },
+    },
+  );
+  const { data: dataOrderActive } = useRequest(ORDER.getOrderActive, {
+    onSuccess: (data) => {
+      console.log('data', data);
+    },
+  });
+
   return (
     <Grid container spacing={2} sx={{ p: [2, 2, 3] }}>
       <Grid item xs={12} md={7}>
@@ -63,7 +82,9 @@ const Home = () => {
               <DashboardItem
                 {...{
                   title: 'Orders',
-                  count: 0,
+                  count:
+                    dataShopPerformance?.specificWeek.totalOrders.toString() ||
+                    '',
                   icon: '/images/dashboard-icons/box.svg',
                 }}
               />
@@ -71,8 +92,12 @@ const Home = () => {
             <Grid item xs={6}>
               <DashboardItem
                 {...{
-                  title: 'Orders',
-                  count: 0,
+                  title: 'Income',
+                  count:
+                    (
+                      dataShopPerformance?.specificWeek.totalAmount &&
+                      +dataShopPerformance?.specificWeek.totalAmount
+                    )?.toString() + '$' || '',
                   icon: '/images/dashboard-icons/hash2.svg',
                 }}
               />
@@ -80,8 +105,9 @@ const Home = () => {
           </Grid>
           <DashboardItem
             {...{
-              title: 'Orders',
-              count: 0,
+              title: 'Cancel',
+              count:
+                dataShopPerformance?.specificWeek.cancelled.toString() || '',
               icon: '/images/dashboard-icons/trending-up2.svg',
             }}
           />
@@ -100,16 +126,16 @@ const Home = () => {
             Active Orders
           </Typography>
           <Typography color='primary' fontWeight='bold' variant='h6' mb={1.5}>
-            0
+            {dataOrderActive?.totalOrders || 0}
           </Typography>
 
           <Grid container spacing={2}>
-            {['Pending', 'Confirm', 'Delivering'].map((status, i) => (
+            {dataOrderActive?.statusCounts.map((status, i) => (
               <Grid key={i} item xs={4}>
                 <DashboardItem
                   {...{
-                    title: status,
-                    count: 0,
+                    title: status.status,
+                    count: status.count.toString(),
                   }}
                 />
               </Grid>

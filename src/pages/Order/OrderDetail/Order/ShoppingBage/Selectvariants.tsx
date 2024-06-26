@@ -1,5 +1,5 @@
 import { useRequest } from 'ahooks';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { GrClose } from 'react-icons/gr';
 
 import {
@@ -12,8 +12,6 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material';
-
-import { AuthContext } from 'contexts/AuthContext';
 
 import ORDER from 'api/Order';
 
@@ -31,29 +29,28 @@ interface Ivariant {
   close: React.Dispatch<React.SetStateAction<boolean>>;
   setId: (id: number) => void;
   refDetail: () => void;
-  productDetail: Iorder.OrderDetail[] | undefined;
+  productDetail: any;
 }
 
 function Selectvariants(props: Ivariant) {
   const errRef = useRef<IErrDialogRef>(null);
-  const [getProductId, setProductId] = useState<Iorder.OrderDetail>();
+  const [getProductId, setProductId] = useState<any>();
   const [selectId, setSelectId] = useState<number[]>([]);
 
-  useEffect(() => {
-    props.productDetail?.map((el) => setProductId(el));
-  }, [props.productDetail]);
+  // useEffect(() => {
+  //   props.productDetail?.map((el) => setProductId(el));
+  // }, [props.productDetail]);
 
-  useEffect(() => {
-    if (getProductId !== undefined) {
-      setSelectId(getProductId.options.map((el) => el.id));
-    } else {
-      setSelectId([]);
-    }
-  }, [getProductId]);
-  const { selectedShop } = useContext(AuthContext);
+  // useEffect(() => {
+  //   if (getProductId !== undefined) {
+  //     setSelectId(getProductId.options.map((el) => el.id));
+  //   } else {
+  //     setSelectId([]);
+  //   }
+  // }, [getProductId]);
+  // const { selectedShop } = useContext(AuthContext);
   const { run: runUpdateVaraint, loading: loadUpdateVaraint } = useRequest(
-    () =>
-      ORDER.runUpdateVaraint(`${selectedShop?.id}`, props.productId, selectId),
+    () => ORDER.runUpdateVaraint(`${1}`, props.productId, selectId),
     {
       manual: true,
       onSuccess: () => {
@@ -67,7 +64,7 @@ function Selectvariants(props: Ivariant) {
     },
   );
   const { data: getProductDetail, loading: loadingGetVaraints } = useRequest(
-    () => ORDER.getProductDetail(`${selectedShop?.id}`, props.id),
+    () => ORDER.getProductDetail(`${1}`, props.id),
     {
       ready: getProductId ? true : false,
       refreshDeps: [getProductId],

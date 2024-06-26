@@ -1,17 +1,19 @@
 import { useRequest } from 'ahooks';
-import AUTH from 'api/Auth';
 import {
+  ReactNode,
   createContext,
   useContext,
-  useState,
   useEffect,
   useRef,
-  ReactNode,
+  useState,
 } from 'react';
+
+import AUTH from 'api/Auth';
+
 import {
-  persistState,
   getPersistedState,
   getPersistedStateSession,
+  persistState,
   persistStateSession,
 } from 'utils/persist-util';
 
@@ -31,19 +33,8 @@ const AuthContextInitValues = {
 };
 
 interface IAuthContext {
-  loadingSellerInfo: boolean;
-  selectedShop?: IAuth.Shop;
   authState: IAuthState;
   setAuthState: React.Dispatch<React.SetStateAction<IAuthState>>;
-  sellerInfo?: IAuth.ISellerInfo;
-  setSellerInfo: (
-    data?:
-      | IAuth.ISellerInfo
-      | ((
-          oldData?: IAuth.ISellerInfo | undefined
-        ) => IAuth.ISellerInfo | undefined)
-      | undefined
-  ) => void;
 }
 
 export const AuthContext = createContext<IAuthContext>(AuthContextInitValues);
@@ -59,30 +50,17 @@ export function AuthWrapper({ children }: { children: ReactNode }) {
     AuthContextInitValues.authState;
 
   const [authState, setAuthState] = useState<IAuthState>(
-    local?.rememberMe ? local : session
+    local?.rememberMe ? local : session,
   );
 
   let selectedShop: IAuth.Shop | undefined;
-
-  const {
-    data: sellerInfo,
-    mutate: setSellerInfo,
-    loading: loadingSellerInfo,
-  } = useRequest(AUTH.getSellerInfo, {
-    ready: authState.authed,
-    refreshDeps: [authState.access_token],
-  });
-
-  selectedShop = sellerInfo?.shops.find(
-    (sh) => sh.id === authState.selectedShopId
-  );
 
   // console.log("sellerInfo:", sellerInfo);
 
   //Version
   useEffect(() => {
     const vers = getPersistedState(
-      `${process.env.REACT_APP_PERSIST_AUTH}-version`
+      `${process.env.REACT_APP_PERSIST_AUTH}-version`,
     );
     if (vers !== process.env.REACT_APP_PERSIST_VER) {
       localStorage.clear();
@@ -90,25 +68,10 @@ export function AuthWrapper({ children }: { children: ReactNode }) {
       setAuthState({ authed: false });
       persistState(
         `${process.env.REACT_APP_PERSIST_AUTH}-version`,
-        process.env.REACT_APP_PERSIST_VER || ''
+        process.env.REACT_APP_PERSIST_VER || '',
       );
     }
   }, []);
-
-  useEffect(() => {
-    if (!initMount.current) {
-      const isSelectedShop =
-        authState?.selectedShopId &&
-        sellerInfo?.shops.find((shop) => shop.id === authState?.selectedShopId);
-      if (!isSelectedShop) {
-        setAuthState({
-          ...authState,
-          selectedShopId: sellerInfo?.shops[0]?.id,
-        });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sellerInfo]);
 
   useEffect(() => {
     if (!initMount.current) {
@@ -121,7 +84,7 @@ export function AuthWrapper({ children }: { children: ReactNode }) {
         !authState.rememberMe &&
           persistStateSession(
             process.env.REACT_APP_PERSIST_AUTH || '',
-            authState
+            authState,
           );
         authState.rememberMe &&
           persistState(process.env.REACT_APP_PERSIST_AUTH || '', authState);
@@ -132,12 +95,8 @@ export function AuthWrapper({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        loadingSellerInfo,
-        selectedShop,
         authState,
         setAuthState,
-        sellerInfo,
-        setSellerInfo,
       }}
     >
       {children}

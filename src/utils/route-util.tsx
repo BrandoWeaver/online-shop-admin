@@ -20,10 +20,13 @@ export const ROUTE_PATH = {
 
 export const ROUTE_API = {
   root: process.env.REACT_APP_API_URL,
-  login: '/oauth/token',
-  getShopPerformance: '/seller/performance/shop/:id',
+  login: '/api/auth/login',
+  getShopPerformance: '/api/orders/performance/weakly-performance',
+  getOrderActive: '/api/orders/orderStatus/status-counts',
+  listOrder: '/api/orders',
+  summary: '/api/orders/history/summary',
+  history: '/api/orders/getOrder/history',
   getShopReport: '/seller/shop/:shopId/report/:reportType/:nDayAgo',
-
   orderList: '/seller/shop/:id/order/list',
   orderDetail: '/seller/shop/:id/order/detail/:orderId',
   updateStatus: '/seller/shop/:id/order/status/update',
@@ -78,10 +81,12 @@ export const ROUTE_API = {
   updateOpHour: '/seller/shop/:id/operating/hour/update',
   testMessage: '/bot/test/message',
 
-  listShopPayment: '/seller/shop/:id/paymentoption/list',
+  listShopPayment: '/api/payments/listpayment',
   listPaymentOpt: '/seller/shop/:id/paymentoption/list/all',
-  addShopPayment: '/seller/shop/:id/paymentoption/add',
-  removePaymentOpt: 'seller/shop/:id/paymentoption/remove',
+
+  addShopPayment: '/api/payments/create',
+
+  removePaymentOpt: '/api/payments/delete/:id',
   replacePaymentOpt: '/seller/shop/:id/paymentoption/replace',
   updateShopDelivery: 'seller/shop/:id/fulfillmentoption/update',
 

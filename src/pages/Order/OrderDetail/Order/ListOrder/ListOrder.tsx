@@ -6,11 +6,11 @@ import { Box, Grid, Stack, Typography } from '@mui/material';
 import theme from 'themes';
 
 interface Iorder {
-  setId: React.Dispatch<React.SetStateAction<number>>;
+  setId: React.Dispatch<React.SetStateAction<string>>;
   productQty: number;
   orderNote: boolean;
   active: boolean;
-  id: number;
+  id: string;
   customerName: string;
   amount: number;
   date: string;
@@ -58,7 +58,7 @@ function ListOrder(props: Iorder) {
               },
             }}
           >
-            {props.id}
+            {props.id.slice(0, 6)}
           </Typography>
         </Grid>
         <Grid item xs={2.25}>

@@ -13,14 +13,14 @@ const Account = lazy(() => import('pages/Account'));
 
 const router = createBrowserRouter(
   [
-    // {
-    //   path: ROUTE_PATH.login,
-    //   element: (
-    //     <Suspense>
-    //       <Login />
-    //     </Suspense>
-    //   ),
-    // },
+    {
+      path: ROUTE_PATH.login,
+      element: (
+        <Suspense>
+          <Login />
+        </Suspense>
+      ),
+    },
     {
       path: ROUTE_PATH.root,
       element: <Layout />,

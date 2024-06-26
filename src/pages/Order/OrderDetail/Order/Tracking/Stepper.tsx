@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 
 interface Istep {
   status: string | undefined;
-  orderTracking: Iorder.OrderTracking[] | undefined;
+  orderTracking: any;
   date?: string;
   StepStatus?: string;
 }
@@ -72,20 +72,21 @@ function StepperTracking(props: Istep) {
             review === 'review'
               ? 'Review'
               : review === 'pending'
-              ? 'Pending'
-              : review === 'confirmed'
-              ? 'Confirmed'
-              : review === 'waiting_driver'
-              ? 'Waiting_driver'
-              : review === 'delivering'
-              ? 'Delivering'
-              : props.status === 'completed'
-              ? 'Completed'
-              : props.status === 'on_hold' || 'false'
-              ? 'On_hold'
-              : props.status === 'cancelled'
-              ? 'Cancelled'
-              : props.status === 'pre_cancelled' && 'Pre_cancelled'
+                ? 'Pending'
+                : review === 'confirmed'
+                  ? 'Confirmed'
+                  : review === 'waiting_driver'
+                    ? 'Waiting_driver'
+                    : review === 'delivering'
+                      ? 'Delivering'
+                      : props.status === 'completed'
+                        ? 'Completed'
+                        : props.status === 'on_hold' || 'false'
+                          ? 'On_hold'
+                          : props.status === 'cancelled'
+                            ? 'Cancelled'
+                            : props.status === 'pre_cancelled' &&
+                              'Pre_cancelled'
           }`}</Typography>
           <Typography
             sx={{
@@ -104,13 +105,13 @@ function StepperTracking(props: Istep) {
   };
   return (
     <Stepper activeStep={activeStep} orientation='vertical'>
-      {props.orderTracking?.map((el) => {
+      {/* {props.orderTracking?.map((el) => {
         return (
           <Step key={el.id}>
             <StepLabel>{stepper(el.status, el.createdAt, el.url)}</StepLabel>
           </Step>
         );
-      })}
+      })} */}
     </Stepper>
   );
 }

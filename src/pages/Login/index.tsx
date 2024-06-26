@@ -1,27 +1,27 @@
-import { useRef } from 'react';
-import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { useRequest } from 'ahooks';
+import { useRef } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Navigate } from 'react-router';
 
 import {
   Avatar,
   Box,
-  Paper,
-  Typography,
   Button,
-  Stack,
-  FormControlLabel,
   Checkbox,
+  FormControlLabel,
   Link,
+  Paper,
+  Stack,
+  Typography,
 } from '@mui/material';
 import Container from '@mui/material/Container';
 
-import AUTH_API from 'api/Auth';
-
 import { useAuthContext } from 'contexts/AuthContext';
 
-import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
+import AUTH_API from 'api/Auth';
+
 import { CusTextField, PasswordInput } from 'components/CusMuiComp/CusInputs';
+import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
 import { LoadingSpiner } from 'components/Loading';
 
 import { ROUTE_PATH } from 'utils/route-util';
@@ -34,24 +34,28 @@ interface IFormInputs {
 
 const Login = () => {
   const errRef = useRef<IErrDialogRef>(null);
-  const { control, handleSubmit } = useForm<IFormInputs>();
+  const { control, handleSubmit, watch } = useForm<IFormInputs>();
   const { authState, setAuthState } = useAuthContext();
 
-  const { run: runLogin, loading: loadingLogin } = useRequest(AUTH_API.login, {
+  const {
+    runAsync: runLogin,
+    data: login,
+    loading: loadingLogin,
+  } = useRequest(AUTH_API.login, {
     manual: true,
-    onSuccess: (data, params) => {
-      // console.log("Suc", data);
-      // console.log("param", params[0]);
-      const loginParams = params[0];
-      if (loginParams) {
+    onSuccess: (data) => {
+      console.log('SuccessRes', data);
+      if (data.token) {
         setAuthState({
           authed: true,
-          rememberMe: loginParams.rememberMe,
+          rememberMe: watch('rememberMe'),
           ...data,
         });
       }
     },
-    onError: (e) => errRef.current?.open(e),
+    onError: (err) => {
+      console.log('errRes', err);
+    },
   });
 
   const onSubmit: SubmitHandler<IFormInputs> = (data) => {
@@ -103,7 +107,7 @@ const Login = () => {
           }}
         />
         <Typography align='center' variant='h3' fontWeight='bold' mt={1} mb={2}>
-          dogenote
+          online shop
         </Typography>
         <form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
           <Stack mt={2} mb={1}>
@@ -194,12 +198,12 @@ const Login = () => {
             >
               {!loadingLogin ? 'Login' : <LoadingSpiner size={26.25} />}
             </Button>
-            <Link variant='caption' color='text.secondary' my={1}>
+            {/* <Link variant='caption' color='text.secondary' my={1}>
               Forget your password?
-            </Link>
-            <Typography variant='body2'>
+            </Link> */}
+            {/* <Typography variant='body2'>
               Don’t have an account? <Link underline='hover'>Register.</Link>
-            </Typography>
+            </Typography> */}
           </Box>
         </form>
       </Paper>

@@ -12,8 +12,6 @@ import {
 } from '@mui/material';
 import { Paper } from '@mui/material';
 
-import { AuthContext } from 'contexts/AuthContext';
-
 import ORDER from 'api/Order';
 
 import { IErrDialogRef } from 'components/Dialog/ErrDialog';
@@ -25,22 +23,20 @@ import { ROUTE_API } from 'utils/route-util';
 import theme from 'themes';
 
 import ConfrimBtn from './BtnBystatus/ConfirmBtn';
-import PendingBtn from './BtnBystatus/PendingBtn';
 import ReviewBtn from './BtnBystatus/ReviewBtn';
 import Customer from './Customer/Customer';
 import { SelectLocation } from './DeliveryLocation/SaveLocation';
 import SelectMap from './DeliveryLocation/SelectMap';
 import DialogCancel from './Dialog/DialogCancel';
 import DialogLocation from './Dialog/DialogLocation';
-import DialogReject from './Dialog/DialogReject';
 import Driver from './Driver/Driver';
 import TopCom from './OrderID';
 import PaymentMethod from './Payment/Payment';
 import ShopingBage from './ShoppingBage/ShopingBage';
 
 interface Iorder {
-  orderDetails: Iorder.OrderDetail[] | undefined;
-  detailId?: number;
+  orderDetails: any;
+  detailId?: string;
   refDetail: () => void;
   loading: boolean;
   status: string | undefined;
@@ -67,7 +63,7 @@ interface Iorder {
   buyerAddressId: number | undefined;
   reciept: any;
   // setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setId: React.Dispatch<React.SetStateAction<number>>;
+  setId: React.Dispatch<React.SetStateAction<string>>;
   location: string;
   setLoction: React.Dispatch<React.SetStateAction<string>>;
   errListDetail: Error | undefined;
@@ -75,12 +71,12 @@ interface Iorder {
 
 function OrderPage(props: Iorder) {
   const errRef = useRef<IErrDialogRef>(null);
-  const { selectedShop } = React.useContext(AuthContext);
+  // const { selectedShop } = React.useContext(AuthContext);
   const [editId, setEditId] = useState<number | ''>();
   const [selectMap, setSelectMap] = useState(true);
   const [cancel, setCancel] = useState(false);
   const [open, setOpen] = useState(false);
-  const [rejectOrder, setRejectOrder] = useState(false);
+  // const [rejectOrder, setRejectOrder] = useState(false);
   const [buyerAddressId, setBuyerAddressId] = useState<number>();
   const [openSavedAddr, setOpenSavedAddr] = useState(false);
   const [label, setLabel] = useState<string>('');
@@ -90,13 +86,11 @@ function OrderPage(props: Iorder) {
     (data) =>
       HttpUtil.post(
         ROUTE_API.deleteOrderProduct
-          .replace(':id', `${selectedShop?.id}`)
+          .replace(':id', `${1}`)
           .replace(':orderDetailId', data),
       ),
     {
       manual: true,
-      ready: selectedShop?.id ? true : false,
-      refreshDeps: [selectedShop?.id],
       onSuccess: () => {
         props.refDetail();
       },
@@ -108,13 +102,10 @@ function OrderPage(props: Iorder) {
 
   const { run: runUpdateQty } = useRequest(
     (orderDetailId, qty) =>
-      HttpUtil.post(
-        ROUTE_API.updateOrderQty.replace(':id', `${selectedShop?.id}`),
-        {
-          orderDetailId: orderDetailId,
-          qty: qty,
-        },
-      ),
+      HttpUtil.post(ROUTE_API.updateOrderQty.replace(':id', `${1}`), {
+        orderDetailId: orderDetailId,
+        qty: qty,
+      }),
     {
       manual: true,
       onError: (e) => errRef.current?.open(e),
@@ -128,7 +119,7 @@ function OrderPage(props: Iorder) {
   const { runAsync: runUpdateOrder } = useRequest(
     (id) =>
       ORDER.updateOrder(
-        `${selectedShop?.id}`,
+        `${1}`,
         id || buyerAddressId,
         'Manage Own Delivery',
         props.detailId,
@@ -148,7 +139,7 @@ function OrderPage(props: Iorder) {
   const { runAsync: runAddress } = useRequest(
     () =>
       ORDER.runUpdateAdrr(
-        `${selectedShop?.id}`,
+        `${1}`,
         `${props.customerContact}`,
         props.currentAdd,
         props.location || 'home',
@@ -174,8 +165,7 @@ function OrderPage(props: Iorder) {
     loading: loadListAddr,
     error: errListAddr,
   } = useRequest(
-    () =>
-      ORDER.runListAddress(`${selectedShop?.id}`, `${props.customerContact}`),
+    () => ORDER.runListAddress(`${1}`, `${props.customerContact}`),
     {
       ready: props.customerContact ? true : false,
       refreshDeps: [props.customerContact],
@@ -197,6 +187,7 @@ function OrderPage(props: Iorder) {
         '::-webkit-scrollbar': { display: 'none' },
       }}
     >
+      sdf
       <ErrDialog ref={errRef} />
       {props.loading ? (
         <Stack
@@ -373,52 +364,53 @@ function OrderPage(props: Iorder) {
                           <CircularProgress size={25} />
                         </Grid>
                       ) : (
-                        listAddress?.buyerAddresses
-                          .filter((el) => el.id === props.buyerAddressId)
-                          .map((task) => {
-                            // console.log("Task", task.id);
-                            return (
-                              <Grid container key={task.id}>
-                                <Grid item xs={10} md={11}>
-                                  <SelectLocation
-                                    Address={task.address}
-                                    labe={task.label}
-                                  />
-                                </Grid>
-                                <Grid
-                                  item
-                                  xs={2}
-                                  md={1}
-                                  sx={{
-                                    display: 'flex',
-                                    justifyContent: 'flex-end',
-                                  }}
-                                >
-                                  <Button
-                                    onClick={() => {
-                                      // console.log('task', task);
-                                      setSelectMap(true);
-                                      setLabel(task.label);
-                                      // setUseLocation(true);
-                                      props.setCenter(task.location);
-                                      props.setAddress(task.address);
-                                      setEdit(true);
-                                    }}
-                                    sx={{
-                                      fontSize: {
-                                        xs: 'body2.fontSize',
-                                        md: 'body1.fontSize',
-                                      },
-                                      minWidth: 0,
-                                      minHeight: 0,
-                                    }}
-                                  >
-                                    Edit
-                                  </Button>
-                                </Grid>
-                              </Grid>
-                            );
-                          })
+                        // listAddress?.buyerAddresses
+                        //   .filter((el) => el.id === props.buyerAddressId)
+                        //   .map((task) => {
+                        //     // console.log("Task", task.id);
+                        //     return (
+                        //       <Grid container key={task.id}>
+                        //         <Grid item xs={10} md={11}>
+                        //           <SelectLocation
+                        //             Address={task.address}
+                        //             labe={task.label}
+                        //           />
+                        //         </Grid>
+                        //         <Grid
+                        //           item
+                        //           xs={2}
+                        //           md={1}
+                        //           sx={{
+                        //             display: 'flex',
+                        //             justifyContent: 'flex-end',
+                        //           }}
+                        //         >
+                        //           <Button
+                        //             onClick={() => {
+                        //               // console.log('task', task);
+                        //               setSelectMap(true);
+                        //               setLabel(task.label);
+                        //               // setUseLocation(true);
+                        //               props.setCenter(task.location);
+                        //               props.setAddress(task.address);
+                        //               setEdit(true);
+                        //             }}
+                        //             sx={{
+                        //               fontSize: {
+                        //                 xs: 'body2.fontSize',
+                        //                 md: 'body1.fontSize',
+                        //               },
+                        //               minWidth: 0,
+                        //               minHeight: 0,
+                        //             }}
+                        //           >
+                        //             Edit
+                        //           </Button>
+                        //         </Grid>
+                        //       </Grid>
+                        //     );
+                        //   })
+                        <></>
                       )}
                     </>
                   )
@@ -637,15 +629,16 @@ function OrderPage(props: Iorder) {
               setId={props.setId}
             />
           ) : props.status === 'pending' ? (
-            <PendingBtn
-              setRejectOrder={setRejectOrder}
-              id={props.detailId}
-              refreshOrderList={props.refreshOrderList}
-              setOrder={props.setOrder}
-              refreshListDetail={props.refDetail}
-              // setOpen={props.setOpen}
-              setId={props.setId}
-            />
+            // <PendingBtn
+            //   setRejectOrder={setRejectOrder}
+            //   id={props.detailId}
+            //   refreshOrderList={props.refreshOrderList}
+            //   setOrder={props.setOrder}
+            //   refreshListDetail={props.refDetail}
+            //   // setOpen={props.setOpen}
+            //   setId={props.setId}
+            // />
+            <></>
           ) : (
             props.status === 'confirmed' && (
               <ConfrimBtn
@@ -660,7 +653,7 @@ function OrderPage(props: Iorder) {
           )}
         </Grid>
       )}
-      <DialogReject
+      {/* <DialogReject
         rejectOrder={rejectOrder}
         setRejectOrder={setRejectOrder}
         id={props.detailId}
@@ -668,7 +661,7 @@ function OrderPage(props: Iorder) {
         setOrder={props.setOrder}
         // setOpen={props.setOpen}
         setId={props.setId}
-      />
+      /> */}
       <DialogCancel
         setOrder={props.setOrder}
         cancel={cancel}

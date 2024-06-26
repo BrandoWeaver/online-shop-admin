@@ -8,7 +8,7 @@ interface Ibnt {
   setOrder: React.Dispatch<React.SetStateAction<string>>;
   orderNote: any[] | undefined;
   order: string;
-  detailId: number;
+  detailId: string;
 }
 function StepButton(prop: Ibnt) {
   // const id = prop.detailId;

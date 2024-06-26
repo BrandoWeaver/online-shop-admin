@@ -13,8 +13,8 @@ const drawerWidth = 150;
 
 function Layout() {
   // console.log('Layout');
-  const { authState, loadingSellerInfo } = useAuthContext();
-  // if (!authState?.authed) return <Navigate to={ROUTE_PATH.login} replace />;
+  const { authState } = useAuthContext();
+  if (!authState?.authed) return <Navigate to={ROUTE_PATH.login} replace />;
   return (
     <Box sx={{ display: 'flex' }}>
       <Navbar {...{ drawerWidth }} />
@@ -25,7 +25,7 @@ function Layout() {
         sx={{ overflow: 'auto', minHeight: '100vh' }}
       >
         <Toolbar sx={{ height: [80, 80, 100] }} />
-        {!loadingSellerInfo ? (
+        {!false ? (
           <Outlet />
         ) : (
           <Stack

@@ -13,6 +13,7 @@ import {
   Fade,
   Paper,
   Stack,
+  Typography,
   useMediaQuery,
 } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
@@ -20,8 +21,6 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import { CalendarIcon } from '@mui/x-date-pickers';
-
-import { AuthContext } from 'contexts/AuthContext';
 
 import ORDER from 'api/Order';
 
@@ -34,7 +33,6 @@ import theme from 'themes';
 import NodataMessage from './OrderDetail/MessageComponent/NodataMessageActive';
 import NodataMessageHistory from './OrderDetail/MessageComponent/NodataMessageHistory';
 import ListOrder from './OrderDetail/Order/ListOrder/ListOrder';
-import NotePage from './OrderDetail/Order/Note/notePage';
 import StepButton from './OrderDetail/Order/StepButton';
 import TrackingPage from './OrderDetail/Order/Tracking/TrackingPage';
 import OrderPage from './OrderDetail/Order/pageOrder';
@@ -42,8 +40,8 @@ import DataHistory from './OrderSumary/History';
 
 const activeOrderStatus = [
   { label: 'Pending', value: 'pending' },
-  { label: 'Delivering', value: 'delivering,delivering_province' },
-  { label: 'Confirmed', value: 'confirmed' },
+  { label: 'Delivering', value: 'processing' },
+  { label: 'Confirmed', value: 'completed' },
 ];
 
 const historyOrderStatus = [
@@ -60,8 +58,8 @@ const libraries: ('places' | 'visualization' | 'drawing' | 'geometry')[] = [
   'visualization',
 ];
 const Order = () => {
-  const { selectedShop } = React.useContext(AuthContext);
-  const [orderId, setId] = useState<number>(-1);
+  // const { selectedShop } = React.useContext(AuthContext);
+  const [orderId, setId] = useState('');
   const [open, setOpen] = useState(false);
   const [pickData, setPickDate] = useState(false);
   const [activeTab, setActiveTab] = React.useState(0);
@@ -76,7 +74,7 @@ const Order = () => {
   const [address, setAddress] = useState<string>();
   const searchRef = useRef<ISearchRef>(null);
   const [curentItem, setCurentItem] = useState<number>();
-  const [curentListOrder, setcurentListOrder] = useState<Iorder.Datum[]>([]);
+  const [curentListOrder, setcurentListOrder] = useState<any>([]);
   const [location, setLocation] = useState<string>('');
   const mediumDown = useMediaQuery(theme.breakpoints.down('md'));
   const currentDate = new Date().toISOString().split('T')[0];
@@ -84,9 +82,7 @@ const Order = () => {
   const orderStatus = activeOrderStatus[active].value;
   const historyStatus = historyOrderStatus[history].value;
   const [curentItemHistory, setCurentItemHistory] = useState<number>();
-  const [curentListOrderHistory, setcurentListOrderHistory] = useState<
-    Iorder.Datum[]
-  >([]);
+  const [curentListOrderHistory, setcurentListOrderHistory] = useState<any>([]);
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: 'AIzaSyAvQvanOfyr5a0qtcDmWrvtE3uFWRqt_lw',
@@ -97,13 +93,10 @@ const Order = () => {
     loading: listDetailLoading,
     refresh: refDetail,
     error: errListDetail,
-  } = useRequest(
-    () => ORDER.getOrderInfo(`${selectedShop?.id}`, `${orderId}`),
-    {
-      ready: orderId !== -1 ? true : false,
-      refreshDeps: [orderId, selectedShop?.id],
-    },
-  );
+  } = useRequest(() => ORDER.getOrderInfo(`${1}`, `${orderId}`), {
+    ready: orderId !== '' ? true : false,
+    refreshDeps: [orderId, 1],
+  });
   const handleClose = () => {
     setPickDate(false);
     refDetail();
@@ -125,22 +118,13 @@ const Order = () => {
     refresh: refreshListOrder,
     error: errListorder,
     loading: loadingListOrder,
-  } = useRequest(
-    () =>
-      ORDER.getListOrder(`${selectedShop?.id}`, page, orderStatus, 'active'),
-    {
-      onSuccess: (data) => {
-        setCurentItem(data.pagination.page);
-        if (page > 0) {
-          setcurentListOrder(curentListOrder.concat(data.data));
-        } else {
-          setcurentListOrder(data.data);
-        }
-      },
-      ready: selectedShop?.id ? true : false,
-      refreshDeps: [selectedShop?.id, active, page],
+  } = useRequest(() => ORDER.getListOrder(orderStatus), {
+    onSuccess: (data) => {
+      console.log('data', data);
     },
-  );
+    ready: 1 ? true : false,
+    refreshDeps: [1, active, page],
+  });
   useEffect(() => {
     setPage(0);
   }, [active]);
@@ -150,52 +134,29 @@ const Order = () => {
     loading: loadListHistory,
     error: errListHistory,
     refresh: refreshListHistory,
-  } = useRequest(
-    () =>
-      ORDER.getListHistoryOrder(
-        `${selectedShop?.id}`,
-        page,
-        historyStatus,
-        'history',
-        startDate,
-        endDate,
-      ),
+  } = useRequest(() => ORDER.getListHistoryOrder(orderStatus), {
+    onSuccess: (data) => {
+      setPickDate(false);
+      console.log('history', data);
+    },
+    onError: (err) => {},
+
+    refreshDeps: [startDate, endDate, orderStatus],
+  });
+  const { data: dataHistory, loading: loadingBystatus } = useRequest(
+    () => ORDER.SummaryOrder(startDate, endDate),
     {
       onSuccess: (data) => {
         setPickDate(false);
-        setCurentItemHistory(data.pagination.page);
-        if (page > 0) {
-          setcurentListOrderHistory(curentListOrderHistory.concat(data.data));
-        } else {
-          setcurentListOrderHistory(data.data);
-        }
+        console.log('summ', data);
       },
       onError: (err) => {},
-      ready: startDate && endDate && activeOrder === 'history' ? true : false,
-      refreshDeps: [selectedShop?.id, history, startDate, endDate, page],
-    },
-  );
-  const { data: dataHistory, loading: loadingBystatus } = useRequest(
-    () =>
-      ORDER.getOrderSummary(
-        `${selectedShop?.id}`,
-        startDate,
-        endDate,
-        historyStatus,
-      ),
-    {
-      onSuccess: () => {
-        setPickDate(false);
-      },
-      onError: (e) => {
-        errRef.current?.open(e);
-      },
-      ready: startDate && endDate && activeOrder === 'history' ? true : false,
-      refreshDeps: [selectedShop?.id, history, startDate, endDate],
+
+      refreshDeps: [startDate, endDate],
     },
   );
   useEffect(() => {
-    if (orderId !== -1) {
+    if (orderId !== '') {
       setOpen(true);
     } else {
       setOpen(false);
@@ -285,7 +246,7 @@ const Order = () => {
                 onClick={() => {
                   setActiveOrder('activeOrder');
                   // setOrder('');
-                  setId(-1);
+                  setId('');
                 }}
               />
               <StyledTab
@@ -301,7 +262,7 @@ const Order = () => {
                 }}
                 onClick={() => {
                   setActiveOrder('history');
-                  setId(-1);
+                  setId('');
                 }}
               />
             </StyledTabs>
@@ -329,7 +290,7 @@ const Order = () => {
                           return (
                             <StyledTab
                               onClick={() => {
-                                setId(-1);
+                                setId('');
                               }}
                               key={el.value}
                               label={el.label}
@@ -352,83 +313,61 @@ const Order = () => {
                       '::-webkit-scrollbar': { display: 'none' },
                     }}
                   >
-                    <InfiniteScroll
-                      scrollableTarget={'container-scroll'}
-                      loader={
-                        <Stack
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            py: 3,
-                          }}
-                        >
-                          <CircularProgress size={25} />
-                        </Stack>
-                      }
-                      hasMore={
-                        listOrder &&
-                        curentItem &&
-                        curentItem < listOrder?.pagination.totalPage
-                          ? true
-                          : false
-                      }
-                      dataLength={curentListOrder.length}
-                      next={() => {
-                        setPage((prev) => prev + 1);
-                      }}
-                    >
-                      {loadingListOrder && !listOrder ? (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            py: 3,
-                            height: 'calc(100vh - 270px)',
-                          }}
-                        >
-                          <CircularProgress size={25} />
-                        </Box>
-                      ) : errListorder ? (
-                        <ErrorResponse
-                          message={
-                            errListorder.message ||
-                            errListorder.error ||
-                            errListorder.error_description
-                          }
-                          typographyProps={{ textAlign: 'center' }}
-                          buttonAction={refreshListOrder}
-                          height='calc(100vh - 270px)'
-                        />
-                      ) : curentListOrder.length === 0 ? (
-                        <Box>
-                          <NodataMessage
+                    {loadingListOrder ? (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          py: 3,
+                          height: 'calc(100vh - 270px)',
+                        }}
+                      >
+                        <CircularProgress size={25} />
+                      </Box>
+                    ) : errListorder ? (
+                      <ErrorResponse
+                        message={
+                          errListorder.message ||
+                          errListorder.error ||
+                          errListorder.error_description
+                        }
+                        typographyProps={{ textAlign: 'center' }}
+                        buttonAction={refreshListOrder}
+                        height='calc(100vh - 270px)'
+                      />
+                    ) : listOrder?.orders.length === 0 ? (
+                      <Box
+                        height='calc(100vh - 270px)'
+                        display={'flex'}
+                        justifyContent={'center'}
+                        alignItems={'center'}
+                      >
+                        {/* <NodataMessage
                             data={curentListOrder.length}
                             height='calc(100vh - 270px)'
-                            status={activeOrderStatus[active].value}
+                            status={activeOrderStatus[active].label}
+                          /> */}
+                        <Typography>No Data</Typography>
+                      </Box>
+                    ) : (
+                      listOrder?.orders?.map((el, index) => {
+                        return (
+                          <ListOrder
+                            active={el._id === orderId}
+                            setId={setId}
+                            date={el.createdAt}
+                            amount={el.totalPrice}
+                            customerName={el.userName}
+                            id={el._id}
+                            key={el._id}
+                            productQty={el.items.length}
+                            orderNote={el.notes !== ''}
                           />
-                        </Box>
-                      ) : (
-                        curentListOrder?.map((el, index) => {
-                          return (
-                            <ListOrder
-                              active={el.id === orderId}
-                              setId={setId}
-                              date={el.createdAt}
-                              amount={el.afterDiscount}
-                              customerName={el.customerName}
-                              id={el.id}
-                              key={el.id}
-                              productQty={el.totalQty}
-                              orderNote={el.orderNotes.length !== 0}
-                            />
-                          );
-                        })
-                      )}
-                    </InfiniteScroll>
+                        );
+                      })
+                    )}
                   </Box>
                 </TabPanel>
               </>
@@ -483,9 +422,9 @@ const Order = () => {
                     )}
                   </Box>
                   <DataHistory
-                    orderNum={dataHistory?.totalOrder}
-                    Totalearn={dataHistory?.totalAmount}
-                    TotalSold={dataHistory?.totalProduct}
+                    orderNum={dataHistory?.totalOrders}
+                    Totalearn={dataHistory?.totalEarnings}
+                    TotalSold={dataHistory?.completedOrders}
                     loading={loadingBystatus}
                   />
                   <Box>
@@ -503,7 +442,7 @@ const Order = () => {
                           value={history}
                           onChange={(e, n) => {
                             setHistory(+n);
-                            setId(-1);
+                            setId('');
                           }}
                         >
                           {historyOrderStatus.map((el, index) => {
@@ -528,83 +467,55 @@ const Order = () => {
                       '::-webkit-scrollbar': { display: 'none' },
                     }}
                   >
-                    <InfiniteScroll
-                      scrollableTarget={'container-scroll'}
-                      loader={
-                        <Stack
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            py: 3,
-                          }}
-                        >
-                          <CircularProgress size={25} />
-                        </Stack>
-                      }
-                      hasMore={
-                        listHistory &&
-                        curentItemHistory &&
-                        curentItemHistory < listHistory?.pagination.totalPage
-                          ? true
-                          : false
-                      }
-                      dataLength={curentListOrderHistory.length}
-                      next={() => {
-                        setPage((prev) => prev + 1);
-                      }}
-                    >
-                      {loadListHistory && !listHistory ? (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            py: 3,
-                            height: 'calc(100vh - 450px)',
-                          }}
-                        >
-                          <CircularProgress size={16} />
-                        </Box>
-                      ) : errListHistory ? (
-                        <ErrorResponse
-                          message={
-                            errListHistory.message ||
-                            errListHistory.error ||
-                            errListHistory.error_description
-                          }
-                          typographyProps={{ textAlign: 'center' }}
-                          buttonAction={refreshListHistory}
+                    {loadListHistory && !listHistory ? (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          py: 3,
+                          height: 'calc(100vh - 450px)',
+                        }}
+                      >
+                        <CircularProgress size={16} />
+                      </Box>
+                    ) : errListHistory ? (
+                      <ErrorResponse
+                        message={
+                          errListHistory.message ||
+                          errListHistory.error ||
+                          errListHistory.error_description
+                        }
+                        typographyProps={{ textAlign: 'center' }}
+                        buttonAction={refreshListHistory}
+                        height='calc(100vh - 450px)'
+                      />
+                    ) : listHistory?.orders.length === 0 ? (
+                      <Box>
+                        <NodataMessageHistory
+                          data={1}
                           height='calc(100vh - 450px)'
+                          status={historyOrderStatus[history].value}
                         />
-                      ) : listHistory?.data.length === 0 ? (
-                        <Box>
-                          <NodataMessageHistory
-                            data={listHistory?.data.length}
-                            height='calc(100vh - 450px)'
-                            status={historyOrderStatus[history].value}
+                      </Box>
+                    ) : (
+                      listHistory?.orders.map((el) => {
+                        return (
+                          <ListOrder
+                            active={el._id === orderId}
+                            setId={setId}
+                            date={el.createdAt}
+                            amount={el.totalPrice}
+                            customerName={el.userName}
+                            id={el._id}
+                            key={el._id}
+                            productQty={el.items.length}
+                            orderNote={el.notes !== ''}
                           />
-                        </Box>
-                      ) : (
-                        curentListOrderHistory.map((el) => {
-                          return (
-                            <ListOrder
-                              active={el.id === orderId}
-                              setId={setId}
-                              date={el.createdAt}
-                              amount={el.afterDiscount}
-                              customerName={el.customerName}
-                              id={el.id}
-                              key={el.id}
-                              productQty={el.totalQty}
-                              orderNote={el.orderNotes.length !== 0}
-                            />
-                          );
-                        })
-                      )}
-                    </InfiniteScroll>
+                        );
+                      })
+                    )}
                   </Box>
                 </TabPanel>
               )
@@ -614,7 +525,7 @@ const Order = () => {
 
         <Grid item xs={0} md={7}>
           <Box sx={{ display: { md: 'block', xs: 'none' } }}>
-            {listDetailLoading ? (
+            {/* {listDetailLoading ? (
               <Stack
                 sx={{
                   display: 'flex',
@@ -640,10 +551,11 @@ const Order = () => {
                   </Fade>
                 </Box>
               )
-            )}
-            {order === 'order' && orderId !== -1 ? (
+            )} */}
+
+            {order === 'order' && orderId !== '' ? (
               <Box>
-                <Fade in={orderId !== -1 ? true : false} timeout={500}>
+                <Fade in={orderId !== '' ? true : false} timeout={500}>
                   <Box>
                     <OrderPage
                       currentAdd={address || ''}
@@ -681,18 +593,19 @@ const Order = () => {
                   </Box>
                 </Fade>
               </Box>
-            ) : order === 'note' && orderId !== -1 ? (
-              <NotePage
-                detailId={orderId}
-                status={data?.status}
-                orderNote={data?.orderNotes}
-                shopName={selectedShop?.name}
-                logo={selectedShop?.logo}
-                date={data?.createdAt}
-                refDetail={refDetail}
-                mark={data?.note}
-              />
-            ) : order === 'track' && orderId !== -1 ? (
+            ) : order === 'note' && orderId !== '' ? (
+              // <NotePage
+              //   detailId={orderId}
+              //   status={data?.status}
+              //   orderNote={data?.orderNotes}
+              //   shopName={selectedShop?.name}
+              //   logo={selectedShop?.logo}
+              //   date={data?.createdAt}
+              //   refDetail={refDetail}
+              //   mark={data?.note}
+              // />
+              <></>
+            ) : order === 'track' && orderId !== '' ? (
               <TrackingPage
                 detailId={orderId}
                 status={data?.status}
@@ -708,7 +621,7 @@ const Order = () => {
               handleClose={() => setOpen(false)}
               children={
                 <>
-                  {orderId !== -1 && (
+                  {orderId !== '' && (
                     <StepButton
                       order={order}
                       setOrder={setOrder}
@@ -716,7 +629,7 @@ const Order = () => {
                       detailId={orderId}
                     />
                   )}
-                  {order === 'order' && orderId !== -1 ? (
+                  {order === 'order' && orderId !== '' ? (
                     <OrderPage
                       currentAdd={address || ''}
                       setAddress={setAddress}
@@ -751,16 +664,17 @@ const Order = () => {
                       errListDetail={errListDetail}
                     />
                   ) : order === 'note' ? (
-                    <NotePage
-                      detailId={orderId}
-                      status={data?.status}
-                      orderNote={data?.orderNotes}
-                      shopName={selectedShop?.name}
-                      logo={selectedShop?.logo}
-                      date={data?.createdAt}
-                      refDetail={refDetail}
-                      mark={data?.note}
-                    />
+                    // <NotePage
+                    //   detailId={orderId}
+                    //   status={data?.status}
+                    //   orderNote={data?.orderNotes}
+                    //   shopName={selectedShop?.name}
+                    //   logo={selectedShop?.logo}
+                    //   date={data?.createdAt}
+                    //   refDetail={refDetail}
+                    //   mark={data?.note}
+                    // />
+                    <></>
                   ) : order === 'track' ? (
                     <TrackingPage
                       detailId={orderId}

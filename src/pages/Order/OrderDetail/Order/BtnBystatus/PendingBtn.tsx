@@ -4,8 +4,6 @@ import { MdClose, MdDone } from 'react-icons/md';
 
 import { Button, Grid } from '@mui/material';
 
-import { AuthContext } from 'contexts/AuthContext';
-
 import ORDER from 'api/Order';
 
 import ConfirmDialog from 'components/Dialog/ConfirmDialog';
@@ -13,7 +11,7 @@ import ErrorDialog from 'components/Dialog/ErrorDialog';
 
 interface Ipening {
   setRejectOrder: React.Dispatch<React.SetStateAction<boolean>>;
-  id: number | undefined;
+  id: string | undefined;
   refreshOrderList: () => void;
   setOrder: React.Dispatch<React.SetStateAction<string>>;
   refreshListDetail: () => void;
@@ -23,10 +21,10 @@ interface Ipening {
 function PendingBtn(props: Ipening) {
   const [open, setOpen] = useState(false);
   const [errOpen, setOpenErr] = useState(false);
-  const { selectedShop } = React.useContext(AuthContext);
+  // const { selectedShop } = React.useContext(AuthContext);
   const { run: runConfrim, error: errConfrim } = useRequest(
     () =>
-      ORDER.runRejectOrder(`${selectedShop?.id}`, props.id, 'confirmed', [
+      ORDER.runRejectOrder(`${1}`, props.id || '', 'confirmed', [
         'Accepting Order',
       ]),
     {

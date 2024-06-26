@@ -1,21 +1,9 @@
 import { memo, useRef, useState } from 'react';
-import {
-  MdArrowDropDown,
-  MdCheck,
-  MdChevronRight,
-  MdLogout,
-  MdOutlineHome,
-} from 'react-icons/md';
+import { MdChevronRight, MdLogout, MdOutlineHome } from 'react-icons/md';
 import { matchPath, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
-import {
-  Avatar,
-  Breadcrumbs,
-  Divider,
-  Link as MuiLink,
-  Tooltip,
-} from '@mui/material';
+import { Avatar, Breadcrumbs, Link as MuiLink, Tooltip } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -42,7 +30,7 @@ interface Props {
 function Navbar({ drawerWidth }: Props) {
   // console.log("Navbar");
   const { pathname } = useLocation();
-  const { sellerInfo, selectedShop, setAuthState } = useAuthContext();
+  const { setAuthState } = useAuthContext();
   const [open, setOpen] = useState(false);
 
   const logoutRef = useRef<IConfDialogRef>(null);
@@ -120,7 +108,7 @@ function Navbar({ drawerWidth }: Props) {
             <Stack>
               {/* {sellerInfo?.shops.map((sh) => (
                 <Button
-                  color={selectedShop?.id === sh.id ? 'primary' : 'inherit'}
+                  color={1 === sh.id ? 'primary' : 'inherit'}
                   key={sh.id}
                   size='large'
                   onClick={() => {
@@ -139,7 +127,7 @@ function Navbar({ drawerWidth }: Props) {
                   <Typography align='left' variant='body2' sx={{ flexGrow: 1 }}>
                     {sh.name}
                   </Typography>
-                  {selectedShop?.id === sh.id && <MdCheck />}
+                  {1 === sh.id && <MdCheck />}
                 </Button>
               ))} */}
               {/* <Divider /> */}
@@ -147,7 +135,7 @@ function Navbar({ drawerWidth }: Props) {
                 size='large'
                 color='error'
                 startIcon={<MdLogout />}
-                onClick={() => logoutRef.current?.open('Logout')}
+                onClick={() => logoutRef.current?.open('logout')}
               >
                 Logout
               </Button>
@@ -167,7 +155,7 @@ function Navbar({ drawerWidth }: Props) {
             }}
             onClick={() => setOpen((prev) => !prev)}
           >
-            {selectedShop?.name}
+            Online Shop
           </Button>
         </Tooltip>
       </Toolbar>

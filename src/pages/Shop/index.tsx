@@ -1,34 +1,28 @@
-import { useRequest } from 'ahooks';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 
 import { AppBar } from '@mui/material';
 import { Box } from '@mui/system';
 
-import { AuthContext } from 'contexts/AuthContext';
-
-import SHOP from 'api/Shop';
-
 import { StyledTab, StyledTabs, TabPanel } from 'components/CusMuiComp/CusTabs';
 
-import OperatingHours from './OperatiingHours';
 import Payment from './Payment';
 import ShopInfo from './ShopInfo';
 
 function Shop() {
   // const [open, setOpen] = useState(false);
-  const { selectedShop } = useContext(AuthContext);
+  // const { selectedShop } = useContext(AuthContext);
   const [active, setActive] = useState(0);
 
-  const { data, refresh, error, loading } = useRequest(
-    () => SHOP.getShopInfo(`${selectedShop?.id}`),
-    {
-      ready: selectedShop?.id ? true : false,
-      refreshDeps: [selectedShop?.id],
-      onError: () => {
-        // setOpen(true);
-      },
-    },
-  );
+  // const { data, refresh, error, loading } = useRequest(
+  //   () => SHOP.getShopInfo(`${1}`),
+  //   {
+  //     ready: 1 ? true : false,
+  //     refreshDeps: [1],
+  //     onError: () => {
+  //       // setOpen(true);
+  //     },
+  //   },
+  // );
 
   // console.log("Data", data);
   return (
@@ -63,40 +57,40 @@ function Shop() {
 
       <TabPanel value={active} index={0}>
         <ShopInfo
-          refresh={refresh}
-          addr={data?.addr}
-          contact={data?.contact}
-          domain={data?.domain}
-          logo={data?.logo}
-          lang={data?.lang}
-          location={data?.location}
-          name={data?.name}
-          poi={data?.poi}
-          primaryColor={data?.primaryColor}
-          secondaryColor={data?.secondaryColor}
-          tagline={data?.tagline}
-          telegramId={data?.telegramId}
-          telegramStatus={data?.telegramStatus}
-          facebookPageId={data?.facebookPageId}
-          groupShopId={data?.groupShopId}
-          mapUrl={data?.mapUrl}
-          tadaLocationId={data?.tadaLocationId}
-          id={data?.id}
-          shopError={error}
-          shoploding={loading}
+        // refresh={refresh}
+        // addr={data?.addr}
+        // contact={data?.contact}
+        // domain={data?.domain}
+        // logo={data?.logo}
+        // lang={data?.lang}
+        // location={data?.location}
+        // name={data?.name}
+        // poi={data?.poi}
+        // primaryColor={data?.primaryColor}
+        // secondaryColor={data?.secondaryColor}
+        // tagline={data?.tagline}
+        // telegramId={data?.telegramId}
+        // telegramStatus={data?.telegramStatus}
+        // facebookPageId={data?.facebookPageId}
+        // groupShopId={data?.groupShopId}
+        // mapUrl={data?.mapUrl}
+        // tadaLocationId={data?.tadaLocationId}
+        // id={data?.id}
+        // shopError={error}
+        // shoploding={loading}
         />
       </TabPanel>
       <TabPanel value={active} index={1}>
-        <Payment refresh={refresh} />
+        <Payment />
       </TabPanel>
-      <TabPanel value={active} index={2}>
+      {/* <TabPanel value={active} index={2}>
         <OperatingHours
           Operating={data?.operatingHour}
           shopError={error}
           refresh={refresh}
           shoploding={loading}
         />
-      </TabPanel>
+      </TabPanel> */}
     </Box>
   );
 }

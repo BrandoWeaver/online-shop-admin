@@ -1,49 +1,42 @@
-import { useRequest } from 'ahooks';
 import React, { useState } from 'react';
 import { MdClose, MdDone } from 'react-icons/md';
 
 import { Button, Grid } from '@mui/material';
 
-import { AuthContext } from 'contexts/AuthContext';
-
-import ORDER from 'api/Order';
-
 import ConfirmDialog from 'components/Dialog/ConfirmDialog';
-import ErrorDialog from 'components/Dialog/ErrorDialog';
 
 interface Ireview {
   setCancel: React.Dispatch<React.SetStateAction<boolean>>;
-  id: number | undefined;
+  id: string | undefined;
   refreshOrderList: () => void;
   setOrder: React.Dispatch<React.SetStateAction<string>>;
   refreshListDetail: () => void;
-  setId: React.Dispatch<React.SetStateAction<number>>;
+  setId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 function ReviewBtn(props: Ireview) {
   const [open, setOpen] = useState(false);
-  const [errOpen, setOpenErr] = useState(false);
-  const { selectedShop } = React.useContext(AuthContext);
-  const { run: runConfrim, error: errConfirm } = useRequest(
-    () => ORDER.runConfirmOrder(`${selectedShop?.id}`, props.id, 'pending'),
-    {
-      manual: true,
-      onSuccess: () => {
-        props.refreshOrderList();
-        setOpen(false);
-        props.setOrder('order');
-        props.refreshListDetail();
-        props.setId(-1);
-      },
-      onError: () => {
-        setOpenErr(true);
-      },
-    },
-  );
+  // const { selectedShop } = React.useContext(AuthContext);
+  // const { run: runConfrim, error: errConfirm } = useRequest(
+  //   () => ORDER.runConfirmOrder(`${1}`, props.id, 'pending'),
+  //   {
+  //     manual: true,
+  //     onSuccess: () => {
+  //       props.refreshOrderList();
+  //       setOpen(false);
+  //       props.setOrder('order');
+  //       props.refreshListDetail();
+  //       props.setId(-1);
+  //     },
+  //     onError: () => {
+  //       setOpenErr(true);
+  //     },
+  //   },
+  // );
 
   return (
     <Grid container>
-      <ErrorDialog
+      {/* <ErrorDialog
         open={errOpen}
         errorTitle='Error Ocured'
         errorMessage={
@@ -52,7 +45,7 @@ function ReviewBtn(props: Ireview) {
           errConfirm?.error_description
         }
         onCloseDialog={() => setOpenErr(false)}
-      />
+      /> */}
       <Grid
         item
         xs={4}
@@ -115,7 +108,7 @@ function ReviewBtn(props: Ireview) {
           message='Are you sure?'
           open={open}
           onCancel={() => setOpen(false)}
-          onConfirm={() => runConfrim()}
+          onConfirm={() => {}}
         />
       </Grid>
     </Grid>

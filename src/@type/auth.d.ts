@@ -1,13 +1,25 @@
 declare namespace IAuth {
+  export interface ILoginRes {
+    status: string;
+    token: string;
+    user: User;
+  }
+
+  export interface User {
+    id: string;
+    username: string;
+    email: string;
+    phone: string;
+  }
   interface ILoginReq {
     username: string;
     password: string;
     rememberMe: boolean;
   }
-  interface ILoginRes {
-    access_token: string;
-    token_type: string;
-  }
+  // interface ILoginRes {
+  //   access_token: string;
+  //   token_type: string;
+  // }
 
   interface IUserInfo {
     id: number;

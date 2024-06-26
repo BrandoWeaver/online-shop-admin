@@ -1,182 +1,85 @@
-import ErrorResponse from 'ErrorRespone';
-import { useRequest } from 'ahooks';
 import CustomizedTables from 'pages/Shop/ShopInfo/TableView';
-import { useState } from 'react';
-import {
-  Controller,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from 'react-hook-form';
 
-import {
-  Avatar,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Grid,
-  Stack,
-  Typography,
-} from '@mui/material';
-import Button from '@mui/material/Button';
+import { Avatar, Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 
-import { BackdropLoading } from 'components/Loading';
+// interface Iform {
+//   SellerName: string;
+//   domain: string;
+//   tagline: string;
+//   shopCate: string;
+//   con1: string;
+//   con2: string;
+//   telgroup: string;
+//   faceId: string;
+//   addr: string;
+//   lati: number;
+//   long: number;
+//   poi: string;
+//   map: string;
+//   lang: string;
+//   img: File;
+//   primaryColor: string;
+//   secondaryColor: string;
+// }
 
-import HttpUtil from 'utils/http-util';
-import { ROUTE_API } from 'utils/route-util';
+function ShopInfo() {
+  // const [edit, setEdit] = useState(false);
+  // const method = useForm<Iform>({ shouldUnregister: true });
+  // const { control } = method;
+  // const [open, setOpen] = useState(false);
 
-import theme from 'themes';
+  // const { run: updateShop } = useRequest(
+  //   async (data) =>
+  //     await HttpUtil.post(ROUTE_API.updateShopInfo.replace(':id', ``), data),
+  //   {
+  //     manual: true,
+  //     onSuccess: () => {
+  //       // props.refresh();
+  //       // setEdit(false);
+  //     },
+  //     onError: () => {
+  //       // setOpen(true);
+  //     },
+  //   },
+  // );
 
-import ChangeColor from './ChangeColor';
-import Edit from './Edit';
+  // const onSubmit: SubmitHandler<Iform> = async (data) => {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append('name', data.SellerName);
+  //     formData.append('tagline', data.tagline);
+  //     formData.append('domain', data.domain);
+  //     formData.append('telegramId', data.telgroup);
+  //     formData.append('addr', data.addr);
+  //     formData.append('poi', data.poi);
+  //     formData.append('location[lat]', data.lati.toString());
+  //     formData.append('location[lng]', data.long.toString());
+  //     formData.append('contact[phone1]', data.con1);
+  //     formData.append('contact[phone2]', data.con2);
+  //     formData.append('lang', data.lang);
 
-interface Iform {
-  SellerName: string;
-  domain: string;
-  tagline: string;
-  shopCate: string;
-  con1: string;
-  con2: string;
-  telgroup: string;
-  faceId: string;
-  addr: string;
-  lati: number;
-  long: number;
-  poi: string;
-  map: string;
-  lang: string;
-  img: File;
-  primaryColor: string;
-  secondaryColor: string;
-}
+  //     formData.append('facebookPageId', data.faceId);
+  //     formData.append('mapUrl', data.map);
 
-interface Ishop {
-  logo?: any;
-  telegramStatus?: string;
-  location?: Location;
-  id?: number;
-  name?: string;
-  status?: any;
-  tagline?: string;
-  domain?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-  lang?: string;
-  facebookPageId?: any;
-  tadaLocationId?: any;
-  telegramId?: string;
-  contact?: Contact;
-  mapUrl?: any;
-  addr: string | undefined;
-  poi: string;
-  groupShopId?: any;
-  refresh: () => void;
-  shopError: Error | undefined;
-  shoploding: boolean;
-}
-
-interface Contact {
-  phone1: string;
-  phone2: string;
-}
-
-interface Location {
-  lat: number;
-  lng: number;
-}
-
-function ShopInfo(props: Ishop) {
-  const [edit, setEdit] = useState(false);
-  const method = useForm<Iform>({ shouldUnregister: true });
-  const { control } = method;
-  const [open, setOpen] = useState(false);
-
-  const {
-    run: updateShop,
-    loading: updateLoading,
-    error: updateError,
-  } = useRequest(
-    async (data) =>
-      await HttpUtil.post(
-        ROUTE_API.updateShopInfo.replace(':id', `${props.id}`),
-        data,
-      ),
-    {
-      manual: true,
-      onSuccess: () => {
-        props.refresh();
-        setEdit(false);
-      },
-      onError: () => {
-        setOpen(true);
-      },
-    },
-  );
-
-  const {
-    run: runTelegram,
-    data: dataTelegram,
-    loading: loadingTelegram,
-  } = useRequest(
-    async (data) =>
-      await HttpUtil.post(ROUTE_API.testMessage, {
-        groupId: data,
-      }),
-    {
-      manual: true,
-      onSuccess: () => {
-        console.log('Success');
-      },
-    },
-  );
-
-  const onSubmit: SubmitHandler<Iform> = async (data) => {
-    try {
-      const formData = new FormData();
-      formData.append('name', data.SellerName);
-      formData.append('tagline', data.tagline);
-      formData.append('domain', data.domain);
-      formData.append('telegramId', data.telgroup);
-      formData.append('addr', data.addr);
-      formData.append('poi', data.poi);
-      formData.append('location[lat]', data.lati.toString());
-      formData.append('location[lng]', data.long.toString());
-      formData.append('contact[phone1]', data.con1);
-      formData.append('contact[phone2]', data.con2);
-      formData.append('lang', data.lang);
-      // formData.append("primaryColor", data?.primaryColor);
-      // formData.append("secondaryColor", data?.secondaryColor);
-      formData.append('facebookPageId', data.faceId);
-      formData.append('mapUrl', data.map);
-      // formData.append("logoFile", data.img);
-      // formData.append("shopCategory", data.shopCate);
-      updateShop(formData);
-    } catch (err) {
-      console.log('Error:', err);
-    }
-  };
-  const handleClose = () => {
-    setOpen(false);
-    // Nav(ROUTE_PATH.seller.detail);
-    setEdit(false);
-  };
+  //     updateShop(formData);
+  //   } catch (err) {
+  //     console.log('Error:', err);
+  //   }
+  // };
 
   return (
     <>
-      {props.shoploding ? (
-        // <Box
-        //   marginTop={{ xs: 15, md: 28 }}
-        //   sx={{
-        //     display: "flex",
-        //     justifyContent: "center",
-        //   }}
-        // >
-        //   <CircularProgress size={20} />
-        // </Box>
+      {/* {props.shoploding ? (
+        <Box
+          marginTop={{ xs: 15, md: 28 }}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress size={20} />
+        </Box>
         <BackdropLoading open />
       ) : props.shopError ? (
         <Box
@@ -220,45 +123,66 @@ function ShopInfo(props: Ishop) {
                 Ok
               </Button>
             </DialogActions>
-          </Dialog>
+          </Dialog> */}
 
-          <Box m={{ md: 1 }} ml={{ md: 5 }}>
-            <Grid container spacing={3}>
-              <Grid
-                item
-                xs={4}
-                md={2}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                }}
-              >
-                <Avatar
-                  // sx={{ width: "100%", height: "auto", aspectRatio: "1/1" }}
-                  sx={{
-                    width: { xs: 100, md: 120 },
-                    height: { xs: 100, md: 120 },
-                    boxShadow: '0px 0px 2px 0px',
-                    border: '6px solid white',
-                  }}
-                  src={`/images/logo.png`}
-                />
-                <Typography
-                  variant='h5'
-                  fontWeight={'bold'}
-                  sx={{
-                    fontSize: { xs: 'body2.fontSize', md: 'body1.fontSize' },
-                    mt: 1,
-                  }}
-                >
-                  Online Shop
-                </Typography>
-              </Grid>
-            </Grid>
-          </Box>
-
-          {edit === true ? (
+      <Box m={{ md: 1 }} ml={{ md: 5 }}>
+        <Grid container spacing={3}>
+          <Grid
+            item
+            xs={4}
+            md={2}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Avatar
+              // sx={{ width: "100%", height: "auto", aspectRatio: "1/1" }}
+              sx={{
+                width: { xs: 100, md: 120 },
+                height: { xs: 100, md: 120 },
+                boxShadow: '0px 0px 2px 0px',
+                border: '6px solid white',
+              }}
+              src={`/images/logo.png`}
+            />
+            <Typography
+              variant='h5'
+              fontWeight={'bold'}
+              sx={{
+                fontSize: { xs: 'body2.fontSize', md: 'body1.fontSize' },
+                mt: 1,
+              }}
+            >
+              Online Shop
+            </Typography>
+          </Grid>
+        </Grid>
+      </Box>
+      <CustomizedTables
+      // addr={props?.addr}
+      // contact={props?.contact}
+      // domain={props?.domain}
+      // logo={props?.logo}
+      // lang={props?.lang}
+      // location={props?.location}
+      // name={props?.name}
+      // poi={props?.poi}
+      // primaryColor={props?.primaryColor}
+      // secondaryColor={props?.secondaryColor}
+      // tagline={props?.tagline}
+      // telegramId={props?.telegramId}
+      // telegramStatus={props?.telegramStatus}
+      // facebookPageId={props?.facebookPageId}
+      // groupShopId={props?.groupShopId}
+      // mapUrl={props?.mapUrl}
+      // tadaLocationId={props?.tadaLocationId}
+      // loadingTelegram={loadingTelegram}
+      // dataTelegram={dataTelegram}
+      // runTelegram={runTelegram}
+      />
+      {/* {edit === true ? (
             <>
               <FormProvider {...method}>
                 <Edit
@@ -352,18 +276,19 @@ function ShopInfo(props: Ishop) {
                 paddingBottom: '30px',
               }}
             >
-              {/* <Button
+              <Button
                 onClick={() => {
                   setEdit(true);
                 }}
                 variant='contained'
               >
                 Edit
-              </Button> */}
+              </Button>
             </div>
-          )}
-        </Box>
-      )}
+          )} */}
+
+      {/* </Box>
+      )} */}
     </>
   );
 }

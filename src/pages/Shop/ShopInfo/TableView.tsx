@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { Button, CircularProgress, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -9,40 +8,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { styled } from '@mui/material/styles';
-
-interface Idetail {
-  logo?: any;
-  telegramStatus?: string;
-  location?: Location;
-  name?: string;
-  status?: any;
-  tagline?: string;
-  domain?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-  lang?: string;
-  facebookPageId?: any;
-  tadaLocationId?: any;
-  telegramId?: string;
-  contact?: Contact;
-  mapUrl?: any;
-  addr?: string;
-  poi?: string;
-  groupShopId?: any;
-  loadingTelegram: boolean;
-  dataTelegram: any;
-  runTelegram: (data: any) => void;
-}
-
-interface Contact {
-  phone1: string;
-  phone2: string;
-}
-
-interface Location {
-  lat: number;
-  lng: number;
-}
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -61,7 +26,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export default function CustomizedTables(props: Idetail) {
+export default function CustomizedTables() {
   function createData(label: string, data: number | string) {
     return { label, data };
   }
