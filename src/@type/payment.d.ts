@@ -1,5 +1,7 @@
 declare namespace Ipayment {
-  export interface IlistPayment {
+  export type IpaymentList = Root2[];
+
+  export interface Root2 {
     _id: string;
     name: string;
     accountNumber: string;

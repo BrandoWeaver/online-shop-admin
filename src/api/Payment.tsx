@@ -25,7 +25,7 @@ const PAYMENT_API = {
     return res.data;
   },
   listAllPayment: async () => {
-    const res = await HttpUtil.get<Ipayment.IlistPayment[]>(
+    const res = await HttpUtil.get<Ipayment.IpaymentList>(
       ROUTE_API.listShopPayment,
     );
     return res.data;

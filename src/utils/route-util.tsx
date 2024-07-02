@@ -80,10 +80,7 @@ export const ROUTE_API = {
   updateOpHour: '/seller/shop/:id/operating/hour/update',
   testMessage: '/bot/test/message',
 
-  listShopPayment: '/api/payments/listpayment',
   listPaymentOpt: '/seller/shop/:id/paymentoption/list/all',
-
-  addShopPayment: '/api/payments/create',
 
   removePaymentOpt: '/api/payments/delete/:id',
   replacePaymentOpt: '/seller/shop/:id/paymentoption/replace',
@@ -97,4 +94,7 @@ export const ROUTE_API = {
   orderDetail: '/api/orders/:orderId',
   updateOrderStatus: '/api/orders/:orderId/status',
   cancelOrder: '/api/orders/:orderId',
+  //payment
+  listShopPayment: '/api/payments/listpayment',
+  addShopPayment: '/api/payments/create',
 };
