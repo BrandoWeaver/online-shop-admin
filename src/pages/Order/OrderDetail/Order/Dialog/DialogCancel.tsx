@@ -1,6 +1,11 @@
+import { useRequest } from 'ahooks';
 import React, { useState } from 'react';
 
-import { Button, Dialog, DialogActions } from '@mui/material';
+import { Button, CircularProgress, Dialog, DialogActions } from '@mui/material';
+
+import ORDER from 'api/Order';
+
+import ErrorDialog from 'components/Dialog/ErrorDialog';
 
 import CancelOrder from './CancelOrder';
 
@@ -15,36 +20,34 @@ interface Icancel {
 
 function DialogCancel(props: Icancel) {
   const [reason, setReson] = useState<string>('');
-  // const [errOpen, setErr] = useState(false);
-  // const { run: runCancelOrder, error: errCancel } = useRequest(
-  //   () =>
-  //     ORDER.runRejectOrder(`${1}`, props.id, 'pre_cancelled', [
-  //       reason,
-  //     ]),
-  //   {
-  //     manual: true,
-  //     onSuccess: () => {
-  //       props.setCancel(false);
-  //       props.refreshOrderList();
-  //       props.setOrder('order');
-  //       props.setId(-1);
-  //     },
-  //     onError: () => {
-  //       setErr(true);
-  //     },
-  //   },
-  // );
+  const [errOpen, setErr] = useState(false);
+  const {
+    run: runCancelOrder,
+    error: errCancel,
+    loading,
+  } = useRequest(ORDER.runRejectOrder, {
+    manual: true,
+    onSuccess: () => {
+      props.setCancel(false);
+      props.refreshOrderList();
+      props.setOrder('order');
+      props.setId('');
+    },
+    onError: () => {
+      setErr(true);
+    },
+  });
 
   return (
     <>
-      {/* <ErrorDialog
+      <ErrorDialog
         open={errOpen}
         errorMessage={
           errCancel?.message || errCancel?.error || errCancel?.error_description
         }
         onCloseDialog={() => setErr(false)}
         errorTitle='Error Ocured'
-      /> */}
+      />
       <Dialog open={props.cancel} fullWidth={true} maxWidth={'xs'}>
         <CancelOrder setReson={setReson} reason={reason} />
         <DialogActions>
@@ -64,7 +67,7 @@ function DialogCancel(props: Icancel) {
           <Button
             autoFocus
             onClick={() => {
-              // runCancelOrder();
+              runCancelOrder(props.id || '');
             }}
             sx={{
               fontSize: {
@@ -73,7 +76,7 @@ function DialogCancel(props: Icancel) {
               },
             }}
           >
-            Confirm
+            {!loading ? 'Confirm' : <CircularProgress size={20} />}
           </Button>
         </DialogActions>
       </Dialog>

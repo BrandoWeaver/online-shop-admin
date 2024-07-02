@@ -17,29 +17,24 @@ interface Iconfirm {
   setId: React.Dispatch<React.SetStateAction<string>>;
 }
 
-function ConfrimBtn(prop: Iconfirm) {
+function ConfrimBtn(props: Iconfirm) {
   const [open, setOpen] = useState(false);
   // const { selectedShop } = React.useContext(AuthContext);
   const [errOpen, setOpenErr] = useState(false);
-  const { run: runManageDelivery, error: errMangeDelivery } = useRequest(
-    () =>
-      ORDER.runRejectOrder(`${1}`, prop.id, 'completed', [
-        'manage own delivery',
-      ]),
-    {
-      manual: true,
-      onSuccess: () => {
-        prop.refreshOrderList();
-        setOpen(false);
-        prop.setOrder('order');
-        prop.refreshListDetail();
-        prop.setId('');
-      },
-      onError: () => {
-        setOpenErr(true);
-      },
+  const {
+    runAsync: runUpdateOrder,
+    error: errMangeDelivery,
+    loading,
+  } = useRequest(() => ORDER.updateOrder(`${props.id}`, 'completed'), {
+    manual: true,
+    onError: (e) => setOpenErr(true),
+    onSuccess: () => {
+      props.refreshOrderList();
+      setOpen(false);
+      props.setId('');
     },
-  );
+  });
+
   return (
     <Grid container>
       <ErrorDialog
@@ -78,14 +73,15 @@ function ConfrimBtn(prop: Iconfirm) {
           }}
         >
           <MdDone style={{ marginRight: 2 }} size={20} />
-          Manage Own Delivery
+          Complete Proccessing
         </Button>
         <ConfirmDialog
-          title='Managing Own Delivery'
+          title='Complete Proccessing'
           message='Are you sure?'
           open={open}
           onCancel={() => setOpen(false)}
-          onConfirm={() => runManageDelivery()}
+          onConfirm={() => runUpdateOrder()}
+          loading={loading}
         />
       </Grid>
     </Grid>

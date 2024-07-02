@@ -47,30 +47,18 @@ const ORDER = {
     );
     return res.data;
   },
-  updateOrder: async (
-    shopId: string,
-    id: number,
-    deliveryOption: string,
-    detailId: string | undefined,
-    zone: string | undefined,
-  ) => {
-    const res = await HttpUtil.post(
-      ROUTE_API.updateOrder.replace(':id', shopId.toString()),
+  updateOrder: async (orderId: string, status: string) => {
+    const res = await HttpUtil.patch(
+      ROUTE_API.updateOrderStatus.replace(':orderId', orderId.toString()),
       {
-        buyerAddressId: id,
-        deliveryOption: deliveryOption,
-        orderId: detailId,
-        shopId: shopId.toString(),
-        zone: zone,
+        status: status,
       },
     );
     return res.data;
   },
-  getOrderInfo: async (shopId: string, orderId: string) => {
-    const res = await HttpUtil.get(
-      ROUTE_API.orderDetail
-        .replace(':id', shopId.toString())
-        .replace(':orderId', orderId.toString()),
+  getOrderInfo: async (orderId: string) => {
+    const res = await HttpUtil.get<Iorder.IorderDetail>(
+      ROUTE_API.orderDetail.replace(':orderId', orderId.toString()),
     );
     return res.data;
   },
@@ -200,19 +188,9 @@ const ORDER = {
     );
     return res.data;
   },
-  runRejectOrder: async (
-    shopId: string,
-    id: string | undefined,
-    status: string,
-    rejectReason: string[],
-  ) => {
-    const res = await HttpUtil.post(
-      ROUTE_API.updateStatus.replace(':id', shopId.toString()),
-      {
-        orderId: id,
-        status: status,
-        rejectReason: rejectReason,
-      },
+  runRejectOrder: async (orderId: string) => {
+    const res = await HttpUtil.delete(
+      ROUTE_API.cancelOrder.replace(':orderId', orderId),
     );
     return res.data;
   },

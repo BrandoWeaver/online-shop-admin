@@ -3,7 +3,6 @@ import ErrorResponse from 'ErrorRespone';
 import { useRequest } from 'ahooks';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { RangePicker } from 'react-trip-date';
 
 import {
@@ -12,7 +11,6 @@ import {
   DialogContent,
   Fade,
   Paper,
-  Stack,
   Typography,
   useMediaQuery,
 } from '@mui/material';
@@ -30,7 +28,6 @@ import FullScreenDialog from 'components/Dialog/FullDialog';
 
 import theme from 'themes';
 
-import NodataMessage from './OrderDetail/MessageComponent/NodataMessageActive';
 import NodataMessageHistory from './OrderDetail/MessageComponent/NodataMessageHistory';
 import ListOrder from './OrderDetail/Order/ListOrder/ListOrder';
 import StepButton from './OrderDetail/Order/StepButton';
@@ -43,9 +40,8 @@ const activeOrderStatus = [
   { label: 'Delivering', value: 'processing' },
   { label: 'Confirmed', value: 'completed' },
 ];
-
 const historyOrderStatus = [
-  { label: 'All', value: 'completed,cancelled' },
+  { label: 'All', value: '' },
   { label: 'Completed', value: 'completed' },
   { label: 'Cancelled', value: 'cancelled' },
 ];
@@ -58,7 +54,6 @@ const libraries: ('places' | 'visualization' | 'drawing' | 'geometry')[] = [
   'visualization',
 ];
 const Order = () => {
-  // const { selectedShop } = React.useContext(AuthContext);
   const [orderId, setId] = useState('');
   const [open, setOpen] = useState(false);
   const [pickData, setPickDate] = useState(false);
@@ -73,17 +68,12 @@ const Order = () => {
   const [mapCenter, setMapCenter] = useState<ICoord>(defaultCoord);
   const [address, setAddress] = useState<string>();
   const searchRef = useRef<ISearchRef>(null);
-  const [curentItem, setCurentItem] = useState<number>();
-  const [curentListOrder, setcurentListOrder] = useState<any>([]);
   const [location, setLocation] = useState<string>('');
   const mediumDown = useMediaQuery(theme.breakpoints.down('md'));
   const currentDate = new Date().toISOString().split('T')[0];
   const [order, setOrder] = React.useState<string>('order');
   const orderStatus = activeOrderStatus[active].value;
-  const historyStatus = historyOrderStatus[history].value;
-  const [curentItemHistory, setCurentItemHistory] = useState<number>();
-  const [curentListOrderHistory, setcurentListOrderHistory] = useState<any>([]);
-
+  const ordreHistoryStatus = historyOrderStatus[active].value;
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: 'AIzaSyAvQvanOfyr5a0qtcDmWrvtE3uFWRqt_lw',
     libraries,
@@ -93,9 +83,10 @@ const Order = () => {
     loading: listDetailLoading,
     refresh: refDetail,
     error: errListDetail,
-  } = useRequest(() => ORDER.getOrderInfo(`${1}`, `${orderId}`), {
-    ready: orderId !== '' ? true : false,
-    refreshDeps: [orderId, 1],
+  } = useRequest(() => ORDER.getOrderInfo(`${orderId}`), {
+    onSuccess: (data) => {
+      console.log('orderDetail:');
+    },
   });
   const handleClose = () => {
     setPickDate(false);
@@ -120,10 +111,9 @@ const Order = () => {
     loading: loadingListOrder,
   } = useRequest(() => ORDER.getListOrder(orderStatus), {
     onSuccess: (data) => {
-      console.log('data', data);
+      console.log('dataListOrder', data);
     },
-    ready: 1 ? true : false,
-    refreshDeps: [1, active, page],
+    refreshDeps: [orderStatus],
   });
   useEffect(() => {
     setPage(0);
@@ -134,13 +124,12 @@ const Order = () => {
     loading: loadListHistory,
     error: errListHistory,
     refresh: refreshListHistory,
-  } = useRequest(() => ORDER.getListHistoryOrder(orderStatus), {
+  } = useRequest(() => ORDER.getListHistoryOrder(ordreHistoryStatus), {
     onSuccess: (data) => {
       setPickDate(false);
       console.log('history', data);
     },
     onError: (err) => {},
-
     refreshDeps: [startDate, endDate, orderStatus],
   });
   const { data: dataHistory, loading: loadingBystatus } = useRequest(
@@ -355,13 +344,13 @@ const Order = () => {
                       listOrder?.orders?.map((el, index) => {
                         return (
                           <ListOrder
-                            active={el._id === orderId}
+                            active={el?._id === orderId || false}
                             setId={setId}
                             date={el.createdAt}
                             amount={el.totalPrice}
                             customerName={el.userName}
-                            id={el._id}
-                            key={el._id}
+                            id={el?._id || ''}
+                            key={el?._id || ''}
                             productQty={el.items.length}
                             orderNote={el.notes !== ''}
                           />
@@ -443,6 +432,7 @@ const Order = () => {
                           onChange={(e, n) => {
                             setHistory(+n);
                             setId('');
+                            setActive(+n);
                           }}
                         >
                           {historyOrderStatus.map((el, index) => {
@@ -451,6 +441,7 @@ const Order = () => {
                                 sx={{ minWidth: 0 }}
                                 label={el.label}
                                 key={el.value}
+                                onClick={() => {}}
                               />
                             );
                           })}
@@ -467,7 +458,7 @@ const Order = () => {
                       '::-webkit-scrollbar': { display: 'none' },
                     }}
                   >
-                    {loadListHistory && !listHistory ? (
+                    {loadListHistory ? (
                       <Box
                         sx={{
                           display: 'flex',
@@ -503,13 +494,13 @@ const Order = () => {
                       listHistory?.orders.map((el) => {
                         return (
                           <ListOrder
-                            active={el._id === orderId}
+                            active={el?._id === orderId || false}
                             setId={setId}
                             date={el.createdAt}
                             amount={el.totalPrice}
                             customerName={el.userName}
-                            id={el._id}
-                            key={el._id}
+                            id={el?._id || ''}
+                            key={el?._id || ''}
                             productQty={el.items.length}
                             orderNote={el.notes !== ''}
                           />
@@ -567,24 +558,24 @@ const Order = () => {
                       refDetail={refDetail}
                       loading={listDetailLoading}
                       status={data?.status}
-                      customerName={data?.customerName}
-                      isFirstOrder={data?.isFirstOrder}
-                      customerContact={data?.customerContact}
-                      zone={data?.zone}
-                      orderDetails={data?.orderDetails}
-                      paymentType={data?.paymentType}
-                      amount={data?.amount}
-                      deliveryFee={data?.deliveryFee}
-                      afterDiscount={data?.afterDiscount}
-                      afterDiscountRiel={data?.afterDiscountRiel}
+                      customerName={data?.userName}
+                      isFirstOrder={true}
+                      customerContact={data?.phoneNumber}
+                      zone={''}
+                      orderDetails={data}
+                      paymentType={''}
+                      amount={data?.totalPrice}
+                      deliveryFee={1}
+                      afterDiscount={1}
+                      afterDiscountRiel={1}
                       date={data?.createdAt}
-                      driverName={data?.driverName}
-                      driverPhone={data?.driverPhone}
-                      plateNumber={data?.plateNumber}
+                      driverName={data?.userName}
+                      driverPhone={data?.phoneNumber}
+                      plateNumber={data?.phoneNumber}
                       refreshOrderList={refreshListOrder}
                       setOrder={setOrder}
-                      buyerAddressId={data?.buyerAddressId}
-                      reciept={data?.paymentReceipt}
+                      buyerAddressId={data?.userId?._id || ''}
+                      reciept={data}
                       setId={setId}
                       location={location}
                       setLoction={setLocation}
@@ -610,7 +601,7 @@ const Order = () => {
                 detailId={orderId}
                 status={data?.status}
                 date={data?.createdAt}
-                orderTracking={data?.orderTrackings || []}
+                orderTracking={[]}
               />
             ) : null}
           </Box>
@@ -625,7 +616,7 @@ const Order = () => {
                     <StepButton
                       order={order}
                       setOrder={setOrder}
-                      orderNote={data?.orderNotes}
+                      orderNote={[]}
                       detailId={orderId}
                     />
                   )}
@@ -640,24 +631,24 @@ const Order = () => {
                       refDetail={refDetail}
                       loading={listDetailLoading}
                       status={data?.status}
-                      customerName={data?.customerName}
-                      isFirstOrder={data?.isFirstOrder}
-                      customerContact={data?.customerContact}
-                      zone={data?.zone}
-                      orderDetails={data?.orderDetails}
-                      paymentType={data?.paymentType}
-                      amount={data?.amount}
-                      deliveryFee={data?.deliveryFee}
-                      afterDiscount={data?.afterDiscount}
-                      afterDiscountRiel={data?.afterDiscountRiel}
+                      customerName={data?.userName}
+                      isFirstOrder={data?._id !== ''}
+                      customerContact={data?.phoneNumber}
+                      zone={''}
+                      orderDetails={data}
+                      paymentType={''}
+                      amount={data?.totalPrice}
+                      deliveryFee={1}
+                      afterDiscount={1}
+                      afterDiscountRiel={1}
                       date={data?.createdAt}
-                      driverName={data?.driverName}
-                      driverPhone={data?.driverPhone}
-                      plateNumber={data?.plateNumber}
+                      driverName={data?.userName}
+                      driverPhone={data?.phoneNumber}
+                      plateNumber={data?.phoneNumber}
                       refreshOrderList={refreshListOrder}
                       setOrder={setOrder}
-                      buyerAddressId={data?.buyerAddressId}
-                      reciept={data?.paymentReceipt}
+                      buyerAddressId={data?.userId?._id || ''}
+                      reciept={data}
                       setId={setId}
                       location={location}
                       setLoction={setLocation}
@@ -680,7 +671,7 @@ const Order = () => {
                       detailId={orderId}
                       status={data?.status}
                       date={data?.createdAt}
-                      orderTracking={data?.orderTrackings || []}
+                      orderTracking={[]}
                     />
                   ) : null}
                 </>

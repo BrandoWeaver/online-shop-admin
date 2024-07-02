@@ -43,14 +43,14 @@ function SelectMap(props: Iselect) {
       setLocation('home');
     }
   }, [props.label]);
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: 'AIzaSyAvQvanOfyr5a0qtcDmWrvtE3uFWRqt_lw',
-    libraries,
-  });
+  // const { isLoaded } = useJsApiLoader({
+  //   googleMapsApiKey: 'AIzaSyAvQvanOfyr5a0qtcDmWrvtE3uFWRqt_lw',
+  //   libraries,
+  // });
 
-  if (!isLoaded) {
-    return <Skeleton />;
-  }
+  // if (!isLoaded) {
+  //   return <Skeleton />;
+  // }
 
   const mapOptions = {
     center: {
@@ -122,7 +122,7 @@ function SelectMap(props: Iselect) {
           position: 'relative',
         }}
       >
-        <GoogleMap
+        {/* <GoogleMap
           onLoad={onMapLoad}
           onDragEnd={handleDragEnd}
           center={props.centerMap || currentLocation}
@@ -139,7 +139,7 @@ function SelectMap(props: Iselect) {
             fullscreenControl: false,
             gestureHandling: 'greedy',
           }}
-        ></GoogleMap>
+        ></GoogleMap> */}
         <Box
           top='50%'
           left='50%'

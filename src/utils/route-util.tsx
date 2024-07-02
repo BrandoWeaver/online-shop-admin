@@ -28,7 +28,6 @@ export const ROUTE_API = {
   history: '/api/orders/getOrder/history',
   getShopReport: '/seller/shop/:shopId/report/:reportType/:nDayAgo',
   orderList: '/seller/shop/:id/order/list',
-  orderDetail: '/seller/shop/:id/order/detail/:orderId',
   updateStatus: '/seller/shop/:id/order/status/update',
   orderHistorySummary: '/seller/shop/:id/order/history/summary',
   updateOrder: '/seller/shop/:id/order/update',
@@ -93,4 +92,9 @@ export const ROUTE_API = {
   getSellerInfo: '/seller/info',
   editSellerInfo: '/seller/info/edit',
   changePassword: '/seller/info/change/password',
+
+  // order
+  orderDetail: '/api/orders/:orderId',
+  updateOrderStatus: '/api/orders/:orderId/status',
+  cancelOrder: '/api/orders/:orderId',
 };

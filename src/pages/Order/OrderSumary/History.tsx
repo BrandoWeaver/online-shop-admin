@@ -59,7 +59,7 @@ function DataHistory(props: Ihistory) {
             alignItems: 'center',
           }}
         >
-          <Typography>Product Sold</Typography>
+          <Typography>Completed</Typography>
           <Typography fontWeight={'bold'} color={theme.palette.primary.main}>
             {props.loading ? (
               <CircularProgress size={16} />

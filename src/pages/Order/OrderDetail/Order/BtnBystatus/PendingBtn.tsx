@@ -15,32 +15,27 @@ interface Ipening {
   refreshOrderList: () => void;
   setOrder: React.Dispatch<React.SetStateAction<string>>;
   refreshListDetail: () => void;
-  setId: React.Dispatch<React.SetStateAction<number>>;
+  setId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 function PendingBtn(props: Ipening) {
   const [open, setOpen] = useState(false);
   const [errOpen, setOpenErr] = useState(false);
   // const { selectedShop } = React.useContext(AuthContext);
-  const { run: runConfrim, error: errConfrim } = useRequest(
-    () =>
-      ORDER.runRejectOrder(`${1}`, props.id || '', 'confirmed', [
-        'Accepting Order',
-      ]),
-    {
-      manual: true,
-      onSuccess: () => {
-        props.refreshOrderList();
-        setOpen(false);
-        props.setOrder('order');
-        props.refreshListDetail();
-        props.setId(-1);
-      },
-      onError: () => {
-        setOpenErr(true);
-      },
+  const {
+    runAsync: runUpdateOrder,
+    error,
+    loading,
+  } = useRequest(() => ORDER.updateOrder(`${props.id}`, 'processing'), {
+    manual: true,
+    onError: (e) => setOpenErr(true),
+    onSuccess: () => {
+      props.refreshOrderList();
+      setOpen(false);
+      props.setId('');
     },
-  );
+  });
+
   return (
     <Grid container>
       <ErrorDialog
@@ -48,9 +43,7 @@ function PendingBtn(props: Ipening) {
         errorTitle='Error Ocured'
         onCloseDialog={() => setOpenErr(false)}
         errorMessage={
-          errConfrim?.message ||
-          errConfrim?.error ||
-          errConfrim?.error_description
+          error?.message || error?.error || error?.error_description
         }
       />
 
@@ -113,7 +106,8 @@ function PendingBtn(props: Ipening) {
           message='Are you sure?'
           open={open}
           onCancel={() => setOpen(false)}
-          onConfirm={() => runConfrim()}
+          onConfirm={() => runUpdateOrder()}
+          loading={loading}
         />
       </Grid>
     </Grid>

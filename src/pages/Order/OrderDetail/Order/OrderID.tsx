@@ -53,19 +53,7 @@ function TopCom(props: ItopCom) {
               background: theme.palette.grey['300'],
             }}
           >
-            {`${
-              props.status === 'review'
-                ? 'Review'
-                : props.status === 'pending'
-                ? 'Pending'
-                : props.status === 'confirmed'
-                ? 'Confirmed'
-                : props.status === 'waiting_driver'
-                ? 'Waiting driver'
-                : props.status === 'delivering'
-                ? 'Delivering'
-                : props.status === 'completed' && 'Completed'
-            }`}
+            {props.status}
           </Typography>
         </Box>
       </Grid>

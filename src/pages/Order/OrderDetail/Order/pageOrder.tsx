@@ -1,3 +1,4 @@
+import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 import ErrorResponse from 'ErrorRespone';
 import { useRequest } from 'ahooks';
 import React, { useCallback, useRef, useState } from 'react';
@@ -23,6 +24,7 @@ import { ROUTE_API } from 'utils/route-util';
 import theme from 'themes';
 
 import ConfrimBtn from './BtnBystatus/ConfirmBtn';
+import PendingBtn from './BtnBystatus/PendingBtn';
 import ReviewBtn from './BtnBystatus/ReviewBtn';
 import Customer from './Customer/Customer';
 import { SelectLocation } from './DeliveryLocation/SaveLocation';
@@ -60,7 +62,7 @@ interface Iorder {
   setAddress: React.Dispatch<React.SetStateAction<string | undefined>>;
   refreshOrderList: () => void;
   setOrder: React.Dispatch<React.SetStateAction<string>>;
-  buyerAddressId: number | undefined;
+  buyerAddressId: string | undefined;
   reciept: any;
   // setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setId: React.Dispatch<React.SetStateAction<string>>;
@@ -68,7 +70,15 @@ interface Iorder {
   setLoction: React.Dispatch<React.SetStateAction<string>>;
   errListDetail: Error | undefined;
 }
-
+export const defaultCoord = { lat: 11.5752538, lng: 104.9000484 };
+const libraries: ('places' | 'visualization' | 'drawing' | 'geometry')[] = [
+  'places',
+  'visualization',
+];
+const containerStyle = {
+  width: '100%',
+  height: '400px',
+};
 function OrderPage(props: Iorder) {
   const errRef = useRef<IErrDialogRef>(null);
   // const { selectedShop } = React.useContext(AuthContext);
@@ -117,14 +127,7 @@ function OrderPage(props: Iorder) {
   );
 
   const { runAsync: runUpdateOrder } = useRequest(
-    (id) =>
-      ORDER.updateOrder(
-        `${1}`,
-        id || buyerAddressId,
-        'Manage Own Delivery',
-        props.detailId,
-        props.zone,
-      ),
+    (id) => ORDER.updateOrder(`${props.detailId}`, 'proccessing'),
     {
       manual: true,
       onError: (e) => errRef.current?.open(e),
@@ -132,6 +135,7 @@ function OrderPage(props: Iorder) {
         props.refDetail();
         setSelectMap(false);
         setEdit(false);
+        props.refreshOrderList();
       },
     },
   );
@@ -176,6 +180,18 @@ function OrderPage(props: Iorder) {
     (id: number) => setBuyerAddressId(id),
     [],
   );
+  const {
+    data: orderDetail,
+    loading: listDetailLoading,
+    refresh: refDetail,
+    error: errListDetail,
+  } = useRequest(() => ORDER.getOrderInfo(`${props.detailId}`), {
+    onSuccess: (data) => {
+      console.log('orderDetail:', data);
+    },
+    refreshDeps: [props.detailId],
+    onError: (e) => errRef.current?.open(e),
+  });
 
   return (
     <Box
@@ -187,9 +203,9 @@ function OrderPage(props: Iorder) {
         '::-webkit-scrollbar': { display: 'none' },
       }}
     >
-      sdf
+      <Box sx={{ visibility: 'hidden' }}>hdf</Box>
       <ErrDialog ref={errRef} />
-      {props.loading ? (
+      {listDetailLoading ? (
         <Stack
           sx={{
             display: 'flex',
@@ -197,12 +213,12 @@ function OrderPage(props: Iorder) {
             justifyContent: 'center',
             p: 0,
             m: 0,
-            height: 'calc(100vh - 200px)',
+            height: 'calc(100vh - 300px)',
           }}
         >
           <CircularProgress size={25} />
         </Stack>
-      ) : props.errListDetail ? (
+      ) : errListDetail ? (
         <>
           <Stack
             sx={{
@@ -213,31 +229,29 @@ function OrderPage(props: Iorder) {
           >
             <div></div>
           </Stack>
-          <ErrorResponse
+          {/* <ErrorResponse
             message={
-              props.errListDetail.message ||
-              props.errListDetail.error ||
-              props.errListDetail.error_description
+              errListDetail.message ||
+              errListDetail.error ||
+              errListDetail.error_description
             }
             typographyProps={{ textAlign: 'center' }}
             buttonAction={props.refDetail}
             height='calc(100vh - 200px)'
-          />
+          /> */}
         </>
       ) : (
         <Grid container>
           <TopCom
             detailId={props.detailId}
-            status={props.status}
+            status={orderDetail?.status}
             date={props.date}
           />
           <Customer
-            customerContact={props.customerContact}
-            customerName={props.customerName}
-            isFirstOrder={props.isFirstOrder}
-            zone={props.zone}
+            customerContact={orderDetail?.phoneNumber}
+            customerName={orderDetail?.userName}
+            zone={'NA'}
           />
-
           {props.status === 'delivering' ? (
             <Driver
               driverName={props.driverName}
@@ -258,354 +272,43 @@ function OrderPage(props: Iorder) {
             >
               Delivery Location
             </Typography>
-          </Grid>
+            <Box sx={{ mt: 2 }}>
+              <GoogleMap
+                mapContainerStyle={containerStyle}
+                center={
+                  {
+                    lat: orderDetail?.lat || -1,
+                    lng: orderDetail?.lng || -1,
+                  } || defaultCoord
+                }
+                zoom={17}
+                options={{
+                  fullscreenControl: false,
+                  streetViewControl: false,
+                  mapTypeControl: false,
+                  zoomControl: false,
+                }}
 
-          {!edit ? (
-            !props.buyerAddressId ? (
-              <>
-                <Grid item xs={12} sx={{ mt: 2 }}>
-                  <Typography
-                    sx={{
-                      fontSize: {
-                        xs: 'body2.fontSize',
-                        md: 'body1.fontSize',
-                      },
-                    }}
-                  >
-                    No address selected
-                  </Typography>
-                </Grid>
-                <Grid item xs={5}></Grid>
-                <Grid item xs={7}>
-                  {listAddress && listAddress?.buyerAddresses.length < 0 ? (
-                    <Button
-                      onClick={() => {
-                        // setNoaddress(true);
-                        // setChooseMap(true);
-                        setEdit(true);
-                        if (
-                          listAddress &&
-                          listAddress.buyerAddresses.length > 0
-                        ) {
-                          setOpenSavedAddr(true);
-                        }
-                      }}
-                      sx={{
-                        fontSize: {
-                          xs: 'body2.fontSize',
-                          md: 'body1.fontSize',
-                        },
-                      }}
-                    >
-                      Use saved address
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => {
-                        // setNoaddress(true);
-                        // setChooseMap(true);
-                        setEdit(true);
-                      }}
-                      sx={{
-                        fontSize: {
-                          xs: 'body2.fontSize',
-                          md: 'body1.fontSize',
-                        },
-                      }}
-                    >
-                      Add new address
-                    </Button>
-                  )}
-                </Grid>
-              </>
-            ) : (
-              <Grid
-                container
-                component={Paper}
-                variant='outlined'
-                sx={{
-                  p: 2,
-                  background: theme.palette.background.default,
-                  mt: 1,
-                  mb: 2,
-                }}
+                //   onClick={handleClick}
               >
-                {errListAddr ? (
-                  <Grid
-                    item
-                    xs={12}
-                    sx={{ display: 'flex', justifyContent: 'center' }}
-                  >
-                    <ErrorResponse
-                      message={
-                        errListAddr.message ||
-                        errListAddr.error ||
-                        errListAddr.error_description
-                      }
-                      typographyProps={{ textAlign: 'center' }}
-                      buttonAction={refreshListAddr}
-                      height='calc(100vh - 580px)'
-                    />
-                  </Grid>
-                ) : (
-                  listAddress?.buyerAddresses.length !== 0 && (
-                    <>
-                      {loadListAddr ? (
-                        <Grid
-                          item
-                          xs={12}
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexDirection: 'row',
-                          }}
-                        >
-                          <CircularProgress size={25} />
-                        </Grid>
-                      ) : (
-                        // listAddress?.buyerAddresses
-                        //   .filter((el) => el.id === props.buyerAddressId)
-                        //   .map((task) => {
-                        //     // console.log("Task", task.id);
-                        //     return (
-                        //       <Grid container key={task.id}>
-                        //         <Grid item xs={10} md={11}>
-                        //           <SelectLocation
-                        //             Address={task.address}
-                        //             labe={task.label}
-                        //           />
-                        //         </Grid>
-                        //         <Grid
-                        //           item
-                        //           xs={2}
-                        //           md={1}
-                        //           sx={{
-                        //             display: 'flex',
-                        //             justifyContent: 'flex-end',
-                        //           }}
-                        //         >
-                        //           <Button
-                        //             onClick={() => {
-                        //               // console.log('task', task);
-                        //               setSelectMap(true);
-                        //               setLabel(task.label);
-                        //               // setUseLocation(true);
-                        //               props.setCenter(task.location);
-                        //               props.setAddress(task.address);
-                        //               setEdit(true);
-                        //             }}
-                        //             sx={{
-                        //               fontSize: {
-                        //                 xs: 'body2.fontSize',
-                        //                 md: 'body1.fontSize',
-                        //               },
-                        //               minWidth: 0,
-                        //               minHeight: 0,
-                        //             }}
-                        //           >
-                        //             Edit
-                        //           </Button>
-                        //         </Grid>
-                        //       </Grid>
-                        //     );
-                        //   })
-                        <></>
-                      )}
-                    </>
-                  )
-                )}
-              </Grid>
-            )
-          ) : openSavedAddr ? (
-            <>
-              <Grid
-                container
-                component={Paper}
-                variant='outlined'
-                sx={{
-                  p: 2,
-                  background: theme.palette.background.default,
-                  mt: 1,
-                  mb: 2,
-                }}
-              >
-                <>
-                  {listAddress && (
-                    <DialogLocation
-                      buyerAddressId={buyerAddressId}
-                      setBuyerAddressId={handleSetBuyerAddressId}
-                      open={open}
-                      setOpen={() => setOpen(false)}
-                      listAddress={listAddress?.buyerAddresses}
-                      idCurrentPlace={props.buyerAddressId}
-                    />
-                  )}
-                  <Grid
-                    item
-                    xs={12}
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'flex-end',
-                    }}
-                  >
-                    <Button
-                      onClick={() => {
-                        if (
-                          buyerAddressId &&
-                          buyerAddressId !== props.buyerAddressId
-                        ) {
-                          runUpdateOrder(buyerAddressId);
-                        }
-                      }}
-                      sx={{
-                        fontSize: {
-                          xs: 'body2.fontSize',
-                          md: 'body1.fontSize',
-                        },
-                      }}
-                    >
-                      Confirm
-                    </Button>
-                    <Button
-                      color='secondary'
-                      onClick={() => {
-                        setEdit(false);
-                      }}
-                      sx={{
-                        fontSize: {
-                          xs: 'body2.fontSize',
-                          md: 'body1.fontSize',
-                        },
-                      }}
-                    >
-                      Close
-                    </Button>
-                  </Grid>
-                </>
-              </Grid>
-            </>
-          ) : (
-            <Grid
-              container
-              component={Paper}
-              variant='outlined'
-              sx={{
-                px: 2,
-                pt: 2,
-                background: theme.palette.background.default,
-                mt: 1,
-                mb: 2,
-                position: 'relative',
-              }}
-            >
-              <Grid item xs={12} md={12}>
-                <SelectMap
-                  currentAdd={props.currentAdd}
-                  selectMap={selectMap}
-                  onChange={props.onChange}
-                  currentLocationButton={true}
-                  location={props.location}
-                  setLocation={props.setLoction}
-                  setAddress={props.setAddress}
-                  setCenter={props.setCenter}
-                  centerMap={props.centerMap}
-                  label={label}
+                <Marker
+                  position={
+                    {
+                      lat: orderDetail?.lat || -1,
+                      lng: orderDetail?.lng || -1,
+                    } || defaultCoord
+                  }
                 />
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-end',
-                  }}
-                >
-                  <Button
-                    onClick={async () => {
-                      await runAddress();
-                    }}
-                    sx={{
-                      fontSize: {
-                        xs: 'body2.fontSize',
-                        md: 'body1.fontSize',
-                      },
-                    }}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setEdit(false);
-                    }}
-                    color='secondary'
-                    sx={{
-                      fontSize: {
-                        xs: 'body2.fontSize',
-                        md: 'body1.fontSize',
-                      },
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </Box>
-              </Grid>
-
-              <Grid item xs={12} display={'flex'} justifyContent={'flex-end'}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    mt: 1,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'flex-end',
-                    }}
-                  ></Box>
-                </Box>
-              </Grid>
-            </Grid>
-          )}
-          {edit && listAddress && listAddress?.buyerAddresses.length > 0 && (
-            <>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  xs: 'body2.fontSize',
-                  md: 'body1.fontSize',
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'flex-end',
-                }}
-              >
-                <Button
-                  onClick={() => {
-                    setOpenSavedAddr((prev) => !prev);
-                    setSelectMap(true);
-                  }}
-                >
-                  {listAddress &&
-                  listAddress?.buyerAddresses.length > 0 &&
-                  !openSavedAddr
-                    ? 'Use Saved Addresses'
-                    : 'Add New Address'}
-                </Button>
-              </Grid>
-            </>
-          )}
-
+              </GoogleMap>
+            </Box>
+          </Grid>
           <ShopingBage
             editId={editId}
             setEditId={setEditId}
             runUpdateQty={runUpdateQty}
             runDeleteProduct={runDeleteProduct}
             detailId={props.detailId}
-            orderDetails={props.orderDetails}
+            orderDetails={orderDetail}
             refDetail={props.refDetail}
             listLoading={props.loading}
             loadDeleteProduct={loadDeleteProduct}
@@ -613,12 +316,68 @@ function OrderPage(props: Iorder) {
           <PaymentMethod
             afterDiscount={props.afterDiscount}
             afterDiscountRiel={props.afterDiscountRiel}
-            amount={props.amount}
+            amount={orderDetail?.totalPrice}
             deliveryFee={props.deliveryFee}
             paymentType={props.paymentType}
             reciept={props.reciept}
           />
-          {props.status === 'review' ? (
+
+          {orderDetail?.status === 'pending' ? (
+            <>
+              <PendingBtn
+                setRejectOrder={setCancel}
+                id={props.detailId}
+                refreshOrderList={props.refreshOrderList}
+                setOrder={props.setOrder}
+                refreshListDetail={props.refDetail}
+                // setOpen={props.setOpen}
+                setId={props.setId}
+              />
+            </>
+          ) : (
+            orderDetail?.status === 'processing' && (
+              <ConfrimBtn
+                id={props.detailId}
+                refreshOrderList={props.refreshOrderList}
+                setOrder={props.setOrder}
+                refreshListDetail={props.refDetail}
+                // setOpen={props.setOpen}
+                setId={props.setId}
+              />
+            )
+          )}
+        </Grid>
+      )}
+      {/* <DialogReject
+        rejectOrder={rejectOrder}
+        setRejectOrder={setRejectOrder}
+        id={props.detailId}
+        refreshOrderList={props.refreshOrderList}
+        setOrder={props.setOrder}
+        // setOpen={props.setOpen}
+        setId={props.setId}
+      /> */}
+      <DialogCancel
+        setOrder={props.setOrder}
+        cancel={cancel}
+        setCancel={setCancel}
+        id={props.detailId}
+        refreshOrderList={props.refreshOrderList}
+        // setOpen={props.setOpen}
+        setId={props.setId}
+      />
+      {/* <ShopingBage
+        editId={editId}
+        setEditId={setEditId}
+        runUpdateQty={runUpdateQty}
+        runDeleteProduct={runDeleteProduct}
+        detailId={props.detailId}
+        orderDetails={orderDetail?.items}
+        refDetail={props.refDetail}
+        listLoading={props.loading}
+        loadDeleteProduct={loadDeleteProduct}
+      /> */}
+      {/* {props.status === 'review' ? (
             <ReviewBtn
               setCancel={setCancel}
               id={props.detailId}
@@ -650,27 +409,7 @@ function OrderPage(props: Iorder) {
                 setId={props.setId}
               />
             )
-          )}
-        </Grid>
-      )}
-      {/* <DialogReject
-        rejectOrder={rejectOrder}
-        setRejectOrder={setRejectOrder}
-        id={props.detailId}
-        refreshOrderList={props.refreshOrderList}
-        setOrder={props.setOrder}
-        // setOpen={props.setOpen}
-        setId={props.setId}
-      /> */}
-      <DialogCancel
-        setOrder={props.setOrder}
-        cancel={cancel}
-        setCancel={setCancel}
-        id={props.detailId}
-        refreshOrderList={props.refreshOrderList}
-        // setOpen={props.setOpen}
-        setId={props.setId}
-      />
+          )} */}
     </Box>
   );
 }

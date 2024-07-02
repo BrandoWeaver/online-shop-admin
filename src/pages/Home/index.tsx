@@ -84,7 +84,7 @@ const Home = () => {
                   title: 'Orders',
                   count:
                     dataShopPerformance?.specificWeek.totalOrders.toString() ||
-                    '',
+                    'NA',
                   icon: '/images/dashboard-icons/box.svg',
                 }}
               />
@@ -93,11 +93,12 @@ const Home = () => {
               <DashboardItem
                 {...{
                   title: 'Income',
-                  count:
+                  count: `${
                     (
                       dataShopPerformance?.specificWeek.totalAmount &&
                       +dataShopPerformance?.specificWeek.totalAmount
-                    )?.toString() + '$' || '',
+                    )?.toString() || 'NA'
+                  } $ `,
                   icon: '/images/dashboard-icons/hash2.svg',
                 }}
               />
@@ -107,7 +108,7 @@ const Home = () => {
             {...{
               title: 'Cancel',
               count:
-                dataShopPerformance?.specificWeek.cancelled.toString() || '',
+                dataShopPerformance?.specificWeek.cancelled.toString() || 'NA',
               icon: '/images/dashboard-icons/trending-up2.svg',
             }}
           />

@@ -32,7 +32,7 @@ function PaymentMethod(props: Ipayment) {
           >
             Payment method:
           </Typography>
-          <Typography
+          {/* <Typography
             sx={{
               fontSize: {
                 xs: 'body2.fontSize',
@@ -44,10 +44,10 @@ function PaymentMethod(props: Ipayment) {
             {props.paymentType === 'online'
               ? 'Online'
               : props.paymentType === 'cash' && 'Cash'}
-          </Typography>
+          </Typography> */}
         </Box>
       </Grid>
-      <Grid
+      {/* <Grid
         item
         xs={5}
         md={4}
@@ -72,11 +72,19 @@ function PaymentMethod(props: Ipayment) {
           onClose={() => setOpen(false)}
           receipt={props.reciept}
         />
-      </Grid>
+      </Grid> */}
 
       <Grid item xs={7} md={8}></Grid>
       <Grid item xs={5} md={4} mt={3}>
         <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'end',
+            mb: 4,
+          }}
+        >
+          {/* <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -94,8 +102,8 @@ function PaymentMethod(props: Ipayment) {
             }}
           >
             Subtotal: {`${props.amount && props.amount.toFixed(2)}$`}
-          </Typography>
-          <Typography
+          </Typography> */}
+          {/* <Typography
             sx={{
               mb: 1,
               fontSize: {
@@ -105,8 +113,8 @@ function PaymentMethod(props: Ipayment) {
             }}
           >
             Delivery Fee: {`${deliveryFee}$`}
-          </Typography>
-          <Typography
+          </Typography> */}
+          {/* <Typography
             sx={{
               mb: 1,
               fontSize: {
@@ -131,7 +139,7 @@ function PaymentMethod(props: Ipayment) {
                 md: 'body1.fontSize',
               },
             }}
-          />
+          /> */}
           <Typography
             fontWeight={'bold'}
             sx={{
@@ -141,7 +149,7 @@ function PaymentMethod(props: Ipayment) {
               },
             }}
           >
-            Total: {`${props.afterDiscount && props.afterDiscount.toFixed(2)}$`}
+            Total: {`${props.amount && +props.amount.toFixed(2)}$`}
           </Typography>
           <Typography
             fontWeight={'bold'}
@@ -152,11 +160,7 @@ function PaymentMethod(props: Ipayment) {
               },
             }}
           >
-            KHR:{' '}
-            {`${
-              props.afterDiscountRiel &&
-              props.afterDiscountRiel.toLocaleString()
-            }`}
+            KHR: {`${props.amount && +props.amount.toFixed(2) * 4000}`}
           </Typography>
         </Box>
       </Grid>

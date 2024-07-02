@@ -9,7 +9,6 @@ import theme from 'themes';
 
 interface Icus {
   customerName: string | undefined;
-  isFirstOrder: boolean | undefined;
   customerContact: string | undefined;
   zone: string | undefined;
 }
@@ -50,27 +49,6 @@ function Customer(props: Icus) {
           >
             {props.customerName}
           </Typography>
-          {props.isFirstOrder === true && (
-            <>
-              <Typography
-                sx={{
-                  background: theme.palette.primary.main,
-                  py: 0.5,
-                  px: 1,
-                  ml: 2,
-                  borderRadius: '10px',
-                  color: theme.palette.background.default,
-
-                  fontSize: {
-                    xs: 'body2.fontSize',
-                    md: 'body1.fontSize',
-                  },
-                }}
-              >
-                New
-              </Typography>
-            </>
-          )}
         </Box>
         <Box
           sx={{
