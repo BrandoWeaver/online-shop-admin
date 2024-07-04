@@ -2,27 +2,35 @@ import HttpUtil from 'utils/http-util';
 import { ROUTE_API } from 'utils/route-util';
 
 const PRODUCT_API = {
+  listProducts: async (cateId?: string, name?: string) => {
+    const res = await HttpUtil.get<IProduct.IproductList>(
+      ROUTE_API.listProduct,
+      {
+        params: {
+          cate_id: cateId,
+          name: name,
+        },
+      },
+    );
+    return res.data;
+  },
   listProduct: async (shopId: number) => {
     const res = await HttpUtil.get<IProduct.IProductList>(
-      ROUTE_API.productList.replace(':id', shopId.toString())
+      ROUTE_API.productList.replace(':id', shopId.toString()),
     );
     return res.data;
   },
 
   listCategory: async (shopId: number) => {
     const res = await HttpUtil.get<IProduct.IProCategory[]>(
-      ROUTE_API.listProCate.replace(':id', shopId.toString())
+      ROUTE_API.listProCate.replace(':id', shopId.toString()),
     );
     return res.data;
   },
 
-  rearrangeCategory: async (
-    shopId: number,
-    data: { id: number; sort: number }
-  ) => {
-    const res = await HttpUtil.post<{ message: string }>(
-      ROUTE_API.rearrangeProCate.replace(':id', shopId.toString()),
-      data
+  rearrangeCategory: async () => {
+    const res = await HttpUtil.get<IProduct.IlistCategory>(
+      ROUTE_API.listCategory,
     );
     return res.data;
   },
@@ -30,7 +38,7 @@ const PRODUCT_API = {
   addNewCategory: async (shopId: number, data: { name: string }) => {
     const res = await HttpUtil.post<{ message: string }>(
       ROUTE_API.addProCate.replace(':id', shopId.toString()),
-      data
+      data,
     );
     return res.data;
   },
@@ -38,7 +46,7 @@ const PRODUCT_API = {
   editCategory: async (shopId: number, data: { id: number; name: string }) => {
     const res = await HttpUtil.post<{ message: string }>(
       ROUTE_API.editProCate.replace(':id', shopId.toString()),
-      data
+      data,
     );
     return res.data;
   },
@@ -47,18 +55,18 @@ const PRODUCT_API = {
     const res = await HttpUtil.post<{ message: string }>(
       ROUTE_API.deleteProCate
         .replace(':id', shopId.toString())
-        .replace(':cateId', cateId.toString())
+        .replace(':cateId', cateId.toString()),
     );
     return res.data;
   },
 
   rearrangeProduct: async (
     shopId: number,
-    data: { id: number; sort: number }
+    data: { id: number; sort: number },
   ) => {
     const res = await HttpUtil.post<{ message: string }>(
       ROUTE_API.rearrangeProduct.replace(':id', shopId.toString()),
-      data
+      data,
     );
     return res.data;
   },
@@ -67,7 +75,7 @@ const PRODUCT_API = {
     const res = await HttpUtil.post<{ message: string }>(
       ROUTE_API.deleteProduct
         .replace(':id', shopId.toString())
-        .replace(':proId', proId.toString())
+        .replace(':proId', proId.toString()),
     );
     return res.data;
   },
@@ -76,7 +84,7 @@ const PRODUCT_API = {
     const res = await HttpUtil.get<IProduct.IProductDetail>(
       ROUTE_API.getProductDetail
         .replace(':id', shopId.toString())
-        .replace(':proId', proId.toString())
+        .replace(':proId', proId.toString()),
     );
     return res.data;
   },
@@ -99,7 +107,7 @@ const PRODUCT_API = {
     }
     const res = await HttpUtil.post<IProduct.IProductDetail>(
       ROUTE_API.addNewProduct.replace(':id', shopId.toString()),
-      formData
+      formData,
     );
     return res.data;
   },
@@ -122,7 +130,7 @@ const PRODUCT_API = {
     }
     const res = await HttpUtil.post<IProduct.IProductDetail>(
       ROUTE_API.updateProduct.replace(':id', shopId.toString()),
-      formData
+      formData,
     );
     return res.data;
   },
@@ -131,7 +139,7 @@ const PRODUCT_API = {
     const res = await HttpUtil.get<IProduct.IProVariant[]>(
       ROUTE_API.listProductVariant
         .replace(':id', shopId.toString())
-        .replace(':proId', proId.toString())
+        .replace(':proId', proId.toString()),
     );
     return res.data;
   },
@@ -139,13 +147,13 @@ const PRODUCT_API = {
   listProductOptions: async (
     shopId: number,
     proId: number,
-    filters: string[]
+    filters: string[],
   ) => {
     const res = await HttpUtil.post<IProduct.IProOption[]>(
       ROUTE_API.filterProductOption
         .replace(':id', shopId.toString())
         .replace(':proId', proId.toString()),
-      { productId: proId, filters }
+      { productId: proId, filters },
     );
     return res.data;
   },
@@ -156,13 +164,13 @@ const PRODUCT_API = {
     data: {
       level: number;
       groupTitle: string;
-    }
+    },
   ) => {
     const res = await HttpUtil.post<IProduct.IUpdateVarRes>(
       ROUTE_API.updateVariant
         .replace(':id', shopId.toString())
         .replace(':proId', proId.toString()),
-      data
+      data,
     );
     return res.data;
   },
@@ -170,13 +178,13 @@ const PRODUCT_API = {
   addNewVariant: async (
     shopId: number,
     proId: number,
-    data: IProduct.IAddNewVariant
+    data: IProduct.IAddNewVariant,
   ) => {
     const res = await HttpUtil.post<IProduct.IProVariant[]>(
       ROUTE_API.addProductVariant
         .replace(':id', shopId.toString())
         .replace(':proId', proId.toString()),
-      data
+      data,
     );
     return res.data;
   },
@@ -184,13 +192,13 @@ const PRODUCT_API = {
   addNewVarOption: async (
     shopId: number,
     proId: number,
-    data: IProduct.IAddNewVarOpt
+    data: IProduct.IAddNewVarOpt,
   ) => {
     const res = await HttpUtil.post<IProduct.IUpdateVarRes>(
       ROUTE_API.addGroupOption
         .replace(':id', shopId.toString())
         .replace(':proId', proId.toString()),
-      data
+      data,
     );
     return res.data;
   },
@@ -198,13 +206,13 @@ const PRODUCT_API = {
   deleteProVariant: async (
     shopId: number,
     proId: number,
-    data: { level: number }
+    data: { level: number },
   ) => {
     const res = await HttpUtil.post<IProduct.IUpdateVarRes>(
       ROUTE_API.deleteProductVariant
         .replace(':id', shopId.toString())
         .replace(':proId', proId.toString()),
-      data
+      data,
     );
     return res.data;
   },
@@ -212,13 +220,13 @@ const PRODUCT_API = {
   deleteProVariantOpt: async (
     shopId: number,
     proId: number,
-    data: { level: number; titles: string[] }
+    data: { level: number; titles: string[] },
   ) => {
     const res = await HttpUtil.post<IProduct.IUpdateVarRes>(
       ROUTE_API.deleteGroupOption
         .replace(':id', shopId.toString())
         .replace(':proId', proId.toString()),
-      data
+      data,
     );
     return res.data;
   },
@@ -226,13 +234,13 @@ const PRODUCT_API = {
   updateVarOptionsPrice: async (
     shopId: number,
     proId: number,
-    data: IProduct.IOptionPrice[]
+    data: IProduct.IOptionPrice[],
   ) => {
     const res = await HttpUtil.post<IProduct.IUpdateVarRes>(
       ROUTE_API.updateOptionPrice
         .replace(':id', shopId.toString())
         .replace(':proId', proId.toString()),
-      data
+      data,
     );
     return res.data;
   },
@@ -240,13 +248,13 @@ const PRODUCT_API = {
   deleteVariantOptions: async (
     shopId: number,
     proId: number,
-    data: number[]
+    data: number[],
   ) => {
     const res = await HttpUtil.post<IProduct.IUpdateVarRes>(
       ROUTE_API.deleteProductOption
         .replace(':id', shopId.toString())
         .replace(':proId', proId.toString()),
-      data
+      data,
     );
     return res.data;
   },

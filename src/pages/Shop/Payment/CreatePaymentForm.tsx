@@ -1,5 +1,5 @@
 import { useRequest } from 'ahooks';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { GrUpload } from 'react-icons/gr';
 import { MdClear } from 'react-icons/md';
@@ -17,6 +17,7 @@ import {
 import PAYMENT_API from 'api/Payment';
 
 import { ICusDialogHandler } from 'components/Dialog/CusDialog';
+import { LoadingSpiner } from 'components/Loading';
 
 import theme from 'themes';
 
@@ -29,11 +30,22 @@ interface IFormInput {
 function PaymentForm({
   closeForm,
   refreshList,
+  updateInfo,
+  updatePayment,
+  loading,
 }: {
   closeForm: React.RefObject<ICusDialogHandler>;
   refreshList: () => void;
+  updateInfo: Ipayment.Root2 | undefined;
+  updatePayment: (params_0: {
+    paymentId: string;
+    name: string;
+    accountNumber: number;
+    image: File | '';
+  }) => void;
+  loading: boolean;
 }) {
-  const { control, handleSubmit, reset } = useForm<IFormInput>({
+  const { control, handleSubmit, reset, setValue } = useForm<IFormInput>({
     defaultValues: {
       image: '',
       accountName: '',
@@ -43,29 +55,37 @@ function PaymentForm({
   const [imagePreview, setImagePreview] = useState<string>('');
   const inputFileRef = React.useRef<HTMLInputElement | null>(null);
 
-  const {
-    run: addPayment,
-    loading: loadingAddPayment,
-    error: errAddPayment,
-  } = useRequest(PAYMENT_API.addPayment, {
-    manual: true,
-    onSuccess: () => {
-      reset();
-      setImagePreview('');
-      closeForm.current?.close();
-      refreshList();
+  const { run: addPayment, loading: loadingAddPayment } = useRequest(
+    PAYMENT_API.addPayment,
+    {
+      manual: true,
+      onSuccess: () => {
+        reset();
+        setImagePreview('');
+        closeForm.current?.close();
+        refreshList();
+      },
+      onError: (error) => {
+        console.error('Error adding payment:', error);
+      },
     },
-    onError: (error) => {
-      console.error('Error adding payment:', error);
-    },
-  });
+  );
 
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
-    addPayment({
-      accountNumber: +data.accountNumber,
-      image: data.image,
-      name: data.accountName,
-    });
+    if (updateInfo) {
+      updatePayment({
+        name: data.accountName,
+        accountNumber: +data.accountNumber,
+        image: data.image,
+        paymentId: updateInfo._id,
+      });
+    } else {
+      addPayment({
+        accountNumber: +data.accountNumber,
+        image: data.image,
+        name: data.accountName,
+      });
+    }
   };
 
   const handleImageChange = (
@@ -78,7 +98,15 @@ function PaymentForm({
       if (onChange) onChange(file);
     }
   };
-
+  useEffect(() => {
+    if (updateInfo) {
+      setValue('accountName', updateInfo.name);
+      setValue('accountNumber', updateInfo.accountNumber);
+    } else {
+      reset();
+    }
+  }, [updateInfo]);
+  console.log('updateInfo', updateInfo);
   return (
     <Box
       component='form'
@@ -102,7 +130,7 @@ function PaymentForm({
             render={({ field }) => (
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Avatar
-                  src={imagePreview || 'default_avatar.png'} // Placeholder image if no preview is available
+                  src={imagePreview || (updateInfo && updateInfo.imageUrl)}
                   sx={{ width: 80, height: 80, cursor: 'pointer' }}
                   variant='rounded'
                   onClick={() => inputFileRef.current?.click()}
@@ -197,9 +225,19 @@ function PaymentForm({
               loadingAddPayment ? <CircularProgress size={20} /> : null
             }
             disabled={loadingAddPayment}
-            sx={{ fontSize: { xs: 14, md: 16 } }}
+            sx={{
+              fontSize: { xs: 14, md: 16 },
+              width: '140px',
+              height: '40px',
+            }}
           >
-            {loadingAddPayment ? 'Saving...' : 'Save'}
+            {loadingAddPayment || loading ? (
+              <LoadingSpiner size={20} />
+            ) : updateInfo ? (
+              'Save Change'
+            ) : (
+              'Save'
+            )}
           </Button>
         </Box>
       </Stack>

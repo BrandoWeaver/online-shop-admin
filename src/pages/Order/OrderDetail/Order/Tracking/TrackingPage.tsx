@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { MdCheck } from 'react-icons/md';
 
 import { Box, Button, Fade, Grid } from '@mui/material';
@@ -14,11 +14,6 @@ interface Itrack {
 }
 
 function TrackingPage(prop: Itrack) {
-  const [url, setUrl] = useState<string>('');
-  // useEffect(() => {
-  //   prop.orderTracking.map((el) => setUrl(el.url));
-  // }, [prop.orderTracking]);
-
   return (
     <Box
       sx={{
@@ -53,13 +48,11 @@ function TrackingPage(prop: Itrack) {
           </Grid>
           <Grid item xs={12}>
             <Button
-              disabled={!url}
               startIcon={<MdCheck />}
               size='large'
               fullWidth
               variant='contained'
               sx={{ mt: 2 }}
-              onClick={() => window.open(url)}
             >
               Track Delivery
             </Button>

@@ -6,11 +6,13 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Dialog, Breakpoint } from '@mui/material';
+
+import { Breakpoint, Dialog } from '@mui/material';
 
 interface ICusDialog {
   maxWidth?: Breakpoint;
   children: ReactNode;
+  handleCloseDialog?: () => void;
 }
 
 export interface ICusDialogHandler {
@@ -22,12 +24,14 @@ type childrenProps = ReactElement<{ params: any }>;
 
 const CusDialog = forwardRef<ICusDialogHandler, ICusDialog>((props, ref) => {
   const [open, setOpen] = useState(false);
-  const { maxWidth = 'xs', children } = props;
+  const { maxWidth = 'xs', children, handleCloseDialog } = props;
 
   const paramsRef = useRef<any>();
-
+  console.log('propsCreatePayment', paramsRef.current);
   const handleClose = () => {
     setOpen(false);
+    handleCloseDialog && handleCloseDialog();
+    console.log('dialog closed');
   };
 
   useImperativeHandle(
@@ -41,7 +45,7 @@ const CusDialog = forwardRef<ICusDialogHandler, ICusDialog>((props, ref) => {
         setOpen(false);
       },
     }),
-    []
+    [],
   );
 
   const childrenWithProps = React.Children.map(children, (child) => {

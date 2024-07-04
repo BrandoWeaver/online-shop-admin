@@ -1,10 +1,13 @@
-import { Avatar, Chip, Stack, Typography, useTheme } from '@mui/material';
-import { MdOutlineLocalMall } from 'react-icons/md';
-import { LoadingSpiner } from 'components/Loading';
 import ErrorResponse from 'ErrorRespone';
-import TextEditor from 'components/TextEditor';
-import { InventoryStatusLabel } from 'utils/data-util';
 import { memo } from 'react';
+import { MdOutlineLocalMall } from 'react-icons/md';
+
+import { Avatar, Chip, Stack, Typography, useTheme } from '@mui/material';
+
+import { LoadingSpiner } from 'components/Loading';
+import TextEditor from 'components/TextEditor';
+
+import { InventoryStatusLabel } from 'utils/data-util';
 
 const DetailView = ({
   data,

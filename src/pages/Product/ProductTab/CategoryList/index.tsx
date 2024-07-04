@@ -1,29 +1,38 @@
-import { memo, useCallback, useRef, useState } from 'react';
+import ErrorResponse from 'ErrorRespone';
 import { useDebounce, useRequest } from 'ahooks';
+import { memo, useCallback, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
+import {
+  MdDelete,
+  MdDragIndicator,
+  MdEdit,
+  MdOutlineExpandCircleDown,
+  MdSearch,
+} from 'react-icons/md';
 
 import {
   Box,
   Button,
   Divider,
+  IconButton,
   InputAdornment,
-  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
   Menu,
   MenuItem,
   Stack,
   Typography,
 } from '@mui/material';
-import { MdSearch, MdEdit, MdDelete } from 'react-icons/md';
 
 import { PRODUCT_API } from 'api/Product';
 
 import { CusTextField } from 'components/CusMuiComp/CusInputs';
-import { BackdropLoading, LoadingSpiner } from 'components/Loading';
-import CusDialog, { ICusDialogHandler } from 'components/Dialog/CusDialog';
 import ConfDialog, { IConfDialogRef } from 'components/Dialog/ConfDialog';
+import CusDialog, { ICusDialogHandler } from 'components/Dialog/CusDialog';
 import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
 import DragableListItem from 'components/DragableList/ListItem';
-import ErrorResponse from 'ErrorRespone';
+import { BackdropLoading, LoadingSpiner } from 'components/Loading';
 
 import CategoryForm from './CateForm';
 
@@ -36,17 +45,17 @@ export const dragDropItemType = 'cate-item';
 
 interface ICategories {
   shopId?: number;
-  selectCate: number | 'all';
-  setSelectCate: React.Dispatch<React.SetStateAction<number | 'all'>>;
-  setSelectPro: React.Dispatch<React.SetStateAction<number | 'new'>>;
+  selectCate: string | 'all';
+  setSelectCate: React.Dispatch<React.SetStateAction<string | 'all'>>;
+  setSelectPro: React.Dispatch<React.SetStateAction<string | 'new'>>;
 
   mutateListCate: (
     data?:
       | IProduct.IProCategory[]
       | ((
-          oldData?: IProduct.IProCategory[] | undefined
+          oldData?: IProduct.IProCategory[] | undefined,
         ) => IProduct.IProCategory[] | undefined)
-      | undefined
+      | undefined,
   ) => void;
   allCategory?: IProduct.IProCategory[];
   loadingListCate: boolean;
@@ -78,12 +87,13 @@ const Categories = ({
 
   const debouncedText = useDebounce(searchText, { wait: 500 });
 
-  const { run: runRearrangeCategory } = useRequest(
+  const { run: runRearrangeCategory, data: listCategories } = useRequest(
     PRODUCT_API.rearrangeCategory,
     {
-      manual: true,
-      ready: Boolean(shopId),
-    }
+      onSuccess: (data) => {
+        console.log('My Cate', data);
+      },
+    },
   );
 
   const { run: runAddCategory, loading: loadingAddCategory } = useRequest(
@@ -93,7 +103,7 @@ const Categories = ({
       ready: Boolean(shopId),
       onError: (err) => errAlert.current?.open(err),
       onSuccess: refreshListCate,
-    }
+    },
   );
 
   const { run: runEditCategory, loading: loadingEditCategory } = useRequest(
@@ -103,7 +113,7 @@ const Categories = ({
       ready: Boolean(shopId),
       onError: (err) => errAlert.current?.open(err),
       onSuccess: refreshListCate,
-    }
+    },
   );
 
   const { run: runDeleteCategory, loading: loadingDeleteCategory } = useRequest(
@@ -113,7 +123,7 @@ const Categories = ({
       ready: Boolean(shopId),
       onError: (err) => errAlert.current?.open(err),
       onSuccess: refreshListCate,
-    }
+    },
   );
 
   const findCard = useCallback(
@@ -127,7 +137,7 @@ const Categories = ({
         return { card, index: -1 };
       }
     },
-    [allCategory]
+    [allCategory],
   );
 
   const moveCard = useCallback(
@@ -142,23 +152,23 @@ const Categories = ({
         });
       }
     },
-    [mutateListCate, allCategory, findCard]
+    [mutateListCate, allCategory, findCard],
   );
 
-  const [, drop] = useDrop(
-    () => ({
-      accept: dragDropItemType,
-      drop(item: IDragDropItem) {
-        if (shopId) {
-          runRearrangeCategory(shopId, {
-            id: item.id,
-            sort: item.index + 1,
-          });
-        }
-      },
-    }),
-    [shopId]
-  );
+  // const [, drop] = useDrop(
+  //   () => ({
+  //     accept: dragDropItemType,
+  //     drop(item: IDragDropItem) {
+  //       if (shopId) {
+  //         runRearrangeCategory(shopId, {
+  //           id: item.id,
+  //           sort: item.index + 1,
+  //         });
+  //       }
+  //     },
+  //   }),
+  //   [shopId],
+  // );
 
   if (!allCategory && loadingListCate) {
     return (
@@ -172,18 +182,18 @@ const Categories = ({
     );
   }
 
-  if (errListCate) {
-    return (
-      <ErrorResponse
-        message={
-          errListCate.error_description ||
-          errListCate.error ||
-          errListCate.message
-        }
-        buttonAction={refreshListCate}
-      />
-    );
-  }
+  // if (errListCate) {
+  //   return (
+  //     <ErrorResponse
+  //       message={
+  //         errListCate.error_description ||
+  //         errListCate.error ||
+  //         errListCate.message
+  //       }
+  //       buttonAction={refreshListCate}
+  //     />
+  //   );
+  // }
   return (
     <>
       <BackdropLoading
@@ -246,9 +256,53 @@ const Categories = ({
           }}
         />
       </Box>
+      {listCategories?.categories?.map((e, i) => {
+        return (
+          <Box>
+            <ListItem
+              disablePadding
+              key={e._id}
+              secondaryAction={
+                <Stack direction='row' spacing={0.25} color='text.secondary'>
+                  {/* <IconButton color='inherit' size='small'>
+                    <MdOutlineExpandCircleDown />
+                  </IconButton> */}
 
-      <List
-        ref={drop}
+                  <IconButton
+                    color='inherit'
+                    size='small'
+                    sx={{
+                      cursor: 'move',
+                    }}
+                    onClick={(e) => setAnchorEl(e.currentTarget)}
+                  >
+                    <MdDragIndicator />
+                  </IconButton>
+                </Stack>
+              }
+            >
+              <ListItemButton
+                onClick={() => setSelectCate(e.cate_id)}
+                sx={{
+                  px: [0, 0, 2],
+                  // bgcolor: active ? 'background.paper' : '',
+                  // color: active ? 'primary.main' : '',
+                }}
+              >
+                <ListItemText
+                  primary={e.name}
+                  primaryTypographyProps={{
+                    noWrap: true,
+                    sx: { maxWidth: '90%' },
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          </Box>
+        );
+      })}
+      {/* <List
+        // ref={drop}
         sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}
       >
         <DragableListItem
@@ -264,30 +318,26 @@ const Categories = ({
             },
           }}
         />
-        {allCategory
-          ?.filter((cate) =>
-            cate.name.toUpperCase().includes(debouncedText.toUpperCase())
-          )
-          ?.map((cate, i) => (
-            <DragableListItem
-              key={cate.id}
-              {...{
-                type: dragDropItemType,
-                id: cate.id,
-                index: i,
-                title: cate.name,
-                active: selectCate === cate.id,
-                onClick: () => {
-                  setSelectCate((prev) => (prev === cate.id ? -1 : cate.id));
-                  setSelectPro(-1);
-                },
-                findCard,
-                moveCard,
-                onMenuClick: (e) => setAnchorEl(e.currentTarget),
-              }}
-            />
-          ))}
-      </List>
+        {listCategories?.categories.map((cate, i) => (
+          <DragableListItem
+            key={cate.id}
+            {...{
+              type: dragDropItemType,
+              id: cate.id,
+              index: i,
+              title: cate.name,
+              active: selectCate === cate.id,
+              onClick: () => {
+                setSelectCate((prev) => (prev === cate.id ? -1 : cate.id));
+                setSelectPro(-1);
+              },
+              findCard,
+              moveCard,
+              onMenuClick: (e) => setAnchorEl(e.currentTarget),
+            }}
+          />
+        ))}
+      </List> */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -310,7 +360,7 @@ const Categories = ({
             setAnchorEl(null);
             if (anchorEl?.id) {
               const cate = allCategory?.find(
-                (cate) => cate.id === +anchorEl.id
+                (cate) => cate.id === +anchorEl.id,
               );
               if (cate) {
                 cateFormRef.current?.open(cate);

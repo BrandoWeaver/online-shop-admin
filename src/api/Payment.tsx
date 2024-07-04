@@ -30,5 +30,27 @@ const PAYMENT_API = {
     );
     return res.data;
   },
+  updatePayment: async ({
+    name,
+    accountNumber,
+    image,
+    paymentId,
+  }: {
+    paymentId: string;
+    name: string;
+    accountNumber: number;
+    image: File | '';
+  }) => {
+    const formData = new FormData();
+    formData.append('name', name || '');
+    accountNumber &&
+      formData.append('accountNumber', accountNumber.toString() || '');
+    formData.append('image', image || '');
+    const res = await HttpUtil.put(
+      ROUTE_API.updateShopPayment.replace(':id', paymentId),
+      formData,
+    );
+    return res.data;
+  },
 };
 export default PAYMENT_API;

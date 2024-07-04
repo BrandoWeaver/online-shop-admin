@@ -9,7 +9,6 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
-  Link,
   Paper,
   Stack,
   Typography,
@@ -37,26 +36,25 @@ const Login = () => {
   const { control, handleSubmit, watch } = useForm<IFormInputs>();
   const { authState, setAuthState } = useAuthContext();
 
-  const {
-    runAsync: runLogin,
-    data: login,
-    loading: loadingLogin,
-  } = useRequest(AUTH_API.login, {
-    manual: true,
-    onSuccess: (data) => {
-      console.log('SuccessRes', data);
-      if (data.token) {
-        setAuthState({
-          authed: true,
-          rememberMe: watch('rememberMe'),
-          ...data,
-        });
-      }
+  const { runAsync: runLogin, loading: loadingLogin } = useRequest(
+    AUTH_API.login,
+    {
+      manual: true,
+      onSuccess: (data) => {
+        console.log('SuccessRes', data);
+        if (data.token) {
+          setAuthState({
+            authed: true,
+            rememberMe: watch('rememberMe'),
+            ...data,
+          });
+        }
+      },
+      onError: (err) => {
+        console.log('errRes', err);
+      },
     },
-    onError: (err) => {
-      console.log('errRes', err);
-    },
-  });
+  );
 
   const onSubmit: SubmitHandler<IFormInputs> = (data) => {
     // console.log('onSubmit:', data);

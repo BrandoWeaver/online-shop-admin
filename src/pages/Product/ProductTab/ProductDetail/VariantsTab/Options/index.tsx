@@ -1,5 +1,6 @@
-import { forwardRef, memo, useImperativeHandle } from 'react';
+import ErrorResponse from 'ErrorRespone';
 import { useRequest } from 'ahooks';
+import { forwardRef, memo, useImperativeHandle } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Button, Grid, Stack, Typography } from '@mui/material';
@@ -7,9 +8,8 @@ import { Button, Grid, Stack, Typography } from '@mui/material';
 import { PRODUCT_API } from 'api/Product';
 
 import { LoadingSpiner } from 'components/Loading';
-import ErrorResponse from 'ErrorRespone';
 
-import { ISelectetOpts, IOptionFormInputs } from '../index';
+import { IOptionFormInputs, ISelectetOpts } from '../index';
 import RenderRow from './RenderRow';
 
 export interface IOptionsHandler {
@@ -40,12 +40,12 @@ const Options = forwardRef<IOptionsHandler, IOptions>(
         PRODUCT_API.listProductOptions(
           shopId,
           proId,
-          Object.values(selectedOpts)
+          Object.values(selectedOpts),
         ),
       {
         cacheKey: `get-${shopId}-product-${proId}-${selectedOpts}-options`,
         refreshDeps: [proId, shopId, selectedOpts],
-      }
+      },
     );
 
     useImperativeHandle(
@@ -55,7 +55,7 @@ const Options = forwardRef<IOptionsHandler, IOptions>(
           refreshListProOpts();
         },
       }),
-      [refreshListProOpts]
+      [refreshListProOpts],
     );
 
     // console.log('listProductOpts:', listProductOpts);
@@ -149,11 +149,11 @@ const Options = forwardRef<IOptionsHandler, IOptions>(
                   sku: opt.sku,
                 }}
               />
-            )
+            ),
         )}
       </Grid>
     );
-  }
+  },
 );
 
 export default memo(Options);

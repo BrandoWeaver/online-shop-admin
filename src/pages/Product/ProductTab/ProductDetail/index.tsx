@@ -9,8 +9,9 @@ import { PRODUCT_API } from 'api/Product';
 import { StyledTab, StyledTabs } from 'components/CusMuiComp/CusTabs';
 import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
 
-import DetailView from './DetailTab/DetailView';
-import ProductForm from './DetailTab/ProForm';
+import ProductDetailPage from '../ProductList/ProductDetail';
+import ProductForm from '../ProductList/ProductForm';
+import CreateProductForm from '../ProductList/ProductForm';
 
 export interface IProductForm
   extends Omit<IProduct.ICreateProData, 'videoFile' | 'thumbnailFile'> {
@@ -23,14 +24,14 @@ export interface IProductForm
   show: boolean;
 }
 interface IProductDetail {
-  selectCate: number | 'all';
-  selectPro: number | 'new';
-  setSelectPro: React.Dispatch<React.SetStateAction<number | 'new'>>;
+  selectCate: string | 'all';
+  selectPro: string | 'new';
+  setSelectPro: React.Dispatch<React.SetStateAction<string | 'new'>>;
 
   allCategory?: IProduct.IProCategory[];
   refreshListCate: () => void;
-  setSelectCate: React.Dispatch<React.SetStateAction<number | 'all'>>;
-
+  setSelectCate: React.Dispatch<React.SetStateAction<string | 'all'>>;
+  productToUpdate: IProduct.Product | undefined;
   edit: boolean;
   setEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -44,24 +45,12 @@ const ProductDetail = ({
   allCategory,
   edit,
   setEdit,
+  productToUpdate,
 }: IProductDetail) => {
   // console.log('ProductDetail:', allCategory);
   const errAlert = useRef<IErrDialogRef>(null);
 
   const [active, setActive] = useState(0);
-
-  const {
-    data: productDetail,
-    loading: loadingGetProDetail,
-    error: errGetProDetail,
-    refresh: refreshProDetail,
-  } = useRequest(PRODUCT_API.getProductDetail, {
-    manual: true,
-    // ready: Boolean(1 && selectPro !== 'new'),
-    onSuccess(data) {
-      // console.log('getProductDetail onSuccess:', data);
-    },
-  });
 
   // const { run: runAddNewProduct, loading: loadingAddNewProduct } = useRequest(
   //   PRODUCT_API.addNewProduct,
@@ -113,14 +102,14 @@ const ProductDetail = ({
 
   const onCancelClick = () => {
     if (selectPro === 'new') {
-      setSelectPro(-1);
+      setSelectPro('');
     }
     setEdit(false);
   };
 
   return (
     <>
-      <ErrDialog ref={errAlert} />
+      {/* <ErrDialog ref={errAlert} /> */}
 
       <Box sx={{ px: [0, 0, 2], top: 0 }}>
         <StyledTabs
@@ -136,7 +125,7 @@ const ProductDetail = ({
           }}
         >
           <StyledTab
-            label='Details'
+            label={selectPro !== 'new' ? 'Product Detail' : 'Add Product'}
             sx={{
               minWidth: 'auto',
               py: 2,
@@ -148,7 +137,7 @@ const ProductDetail = ({
               },
             }}
           />
-          <StyledTab
+          {/* <StyledTab
             label='Variants'
             sx={{
               minWidth: 'auto',
@@ -159,14 +148,14 @@ const ProductDetail = ({
                 color: 'text.secondary',
               },
             }}
-          />
+          /> */}
         </StyledTabs>
       </Box>
 
       {active === 0 && (
         <>
           <Box sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-            {edit ? (
+            {/* {edit ? (
               <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
                   <ProductForm {...{ allCategory }} />
@@ -188,9 +177,14 @@ const ProductDetail = ({
                   error: errGetProDetail,
                 }}
               />
+            )} */}
+            {selectPro === 'new' ? (
+              <CreateProductForm />
+            ) : (
+              <ProductDetailPage {...productToUpdate} />
             )}
           </Box>
-          <Stack direction='row' justifyContent='center' spacing={2} my={2}>
+          {/* <Stack direction='row' justifyContent='center' spacing={2} my={2}>
             {!edit ? (
               <Button
                 variant='contained'
@@ -214,7 +208,7 @@ const ProductDetail = ({
                 </Button>
               </>
             )}
-          </Stack>
+          </Stack> */}
         </>
       )}
 

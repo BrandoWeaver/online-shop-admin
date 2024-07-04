@@ -1,23 +1,8 @@
-import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { FaPen } from 'react-icons/fa';
-import { StringMappingType } from 'typescript';
+import React from 'react';
 
-import {
-  Avatar,
-  Box,
-  Button,
-  Grid,
-  Paper,
-  TextField,
-  Typography,
-} from '@mui/material';
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import { Avatar, Box, Grid, Paper, Typography } from '@mui/material';
 
 import theme from 'themes';
-
-import AddNewProduct from './AddNewProduct';
-import Selectvariants from './Selectvariants';
 
 interface Ishop {
   editId: number | '' | undefined;
@@ -25,21 +10,11 @@ interface Ishop {
   detailId: string | undefined;
   refDetail: () => void;
   setEditId: React.Dispatch<React.SetStateAction<number | '' | undefined>>;
-  runUpdateQty: (orderDetailId: any, qty: any) => void;
   runDeleteProduct: (data: any) => void;
   listLoading: boolean;
   loadDeleteProduct: boolean;
 }
-interface Ifrom {
-  qty: number | '';
-}
-
 function ShopingBage(props: Ishop) {
-  const { control, watch } = useForm<Ifrom>({ shouldUnregister: true });
-  const watchqty = watch('qty');
-  const [addProduct, setProduct] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [proId, setProId] = useState<number>();
   return (
     <Box mt={2}>
       <Grid item xs={12}>

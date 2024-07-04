@@ -1,8 +1,4 @@
-import React, { useState } from 'react';
-
-import { Box, Button, Divider, Grid, Typography } from '@mui/material';
-
-import VeiwReciept from './veiwReciept';
+import { Box, Grid, Typography } from '@mui/material';
 
 interface Ipayment {
   paymentType: string | undefined;
@@ -14,9 +10,6 @@ interface Ipayment {
 }
 
 function PaymentMethod(props: Ipayment) {
-  const [open, setOpen] = useState(false);
-  const deliveryFee = props.deliveryFee?.toFixed(2);
-
   return (
     <Grid container mt={2} sx={{ display: 'flex', alignItems: 'center' }}>
       <Grid item xs={7} md={8}>
@@ -140,6 +133,7 @@ function PaymentMethod(props: Ipayment) {
               },
             }}
           /> */}
+          Button
           <Typography
             fontWeight={'bold'}
             sx={{

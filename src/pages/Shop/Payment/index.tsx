@@ -1,16 +1,12 @@
 import { useRequest } from 'ahooks';
 import React, { useRef, useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { MdAdd, MdDelete } from 'react-icons/md';
 import { MdEdit } from 'react-icons/md';
 
-import { EditOff } from '@mui/icons-material';
-import CreateSharpIcon from '@mui/icons-material/CreateSharp';
 import {
   Avatar,
   Box,
   Button,
-  CircularProgress,
   Divider,
   Grid,
   Stack,
@@ -29,19 +25,10 @@ import theme from 'themes';
 
 import PaymentForm from './CreatePaymentForm';
 
-interface Ibank {
-  image: File | '';
-  accountName: string;
-  accountNumber: string;
-}
-
 function Payment() {
   const [deletePay, setDeletePayment] = useState('');
   const [open, setOpen] = useState(false);
-  const { control, handleSubmit } = useForm<Ibank>({
-    shouldUnregister: true,
-  });
-
+  const [updateData, setUpdateData] = useState<Ipayment.Root2>();
   const {
     refresh: refreshListBank,
     loading: loadingListAllBank,
@@ -51,28 +38,13 @@ function Payment() {
       console.log('listPayment', data);
     },
   });
-
-  const {
-    error: errRemovePayment,
-    run: deletePayment,
-    loading: loadingDeletePayment,
-  } = useRequest((id: string) => PAYMENT_API.deletePayment(id), {
-    manual: true,
-    onSuccess: () => {
-      refreshListBank();
-      setDeletePayment('');
-    },
-    onError: () => {
-      setOpen(true);
-    },
-  });
-
-  const { run: addPayment, error: errAddPayment } = useRequest(
-    PAYMENT_API.addPayment,
+  const { run: deletePayment, loading: loadingDeletePayment } = useRequest(
+    (id: string) => PAYMENT_API.deletePayment(id),
     {
       manual: true,
       onSuccess: () => {
         refreshListBank();
+        setDeletePayment('');
       },
       onError: () => {
         setOpen(true);
@@ -80,10 +52,33 @@ function Payment() {
     },
   );
 
-  const onSubmit: SubmitHandler<Ibank> = (data) => {
-    addPayment({ name: '', accountNumber: 1, image: '' });
-  };
+  const { error: errAddPayment } = useRequest(PAYMENT_API.addPayment, {
+    manual: true,
+    onSuccess: () => {
+      refreshListBank();
+    },
+    onError: () => {
+      setOpen(true);
+    },
+  });
   const cateFormRef = useRef<ICusDialogHandler>(null);
+  const handleOpen = () => {
+    setUpdateData(undefined);
+  };
+  const { run: updatePayment, loading: loadingupdatePayment } = useRequest(
+    PAYMENT_API.updatePayment,
+    {
+      manual: true,
+      onSuccess: () => {
+        handleOpen();
+        cateFormRef.current?.close();
+        refreshListBank();
+      },
+      onError: (error) => {
+        console.error('Error adding payment:', error);
+      },
+    },
+  );
   return (
     <Box
       sx={{
@@ -100,8 +95,19 @@ function Payment() {
         loading={loadingDeletePayment}
         message='Are you sure?'
       />
-      <CusDialog ref={cateFormRef}>
-        <PaymentForm closeForm={cateFormRef} refreshList={refreshListBank} />
+      <CusDialog
+        ref={cateFormRef}
+        handleCloseDialog={() => {
+          handleOpen();
+        }}
+      >
+        <PaymentForm
+          closeForm={cateFormRef}
+          refreshList={refreshListBank}
+          updateInfo={updateData}
+          updatePayment={updatePayment}
+          loading={loadingupdatePayment}
+        />
       </CusDialog>
       {loadingListAllBank ? (
         <Box
@@ -172,7 +178,10 @@ function Payment() {
                   color='primary'
                   sx={{ minWidth: '0px' }}
                   variant='text'
-                  onClick={cateFormRef.current?.open}
+                  onClick={() => {
+                    setUpdateData(i);
+                    cateFormRef.current?.open(i);
+                  }}
                 >
                   <MdEdit size={20} />
                 </Button>

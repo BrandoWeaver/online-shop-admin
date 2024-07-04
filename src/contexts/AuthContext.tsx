@@ -1,4 +1,3 @@
-import { useRequest } from 'ahooks';
 import {
   ReactNode,
   createContext,
@@ -7,8 +6,6 @@ import {
   useRef,
   useState,
 } from 'react';
-
-import AUTH from 'api/Auth';
 
 import {
   getPersistedState,
@@ -52,9 +49,6 @@ export function AuthWrapper({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState<IAuthState>(
     local?.rememberMe ? local : session,
   );
-
-  let selectedShop: IAuth.Shop | undefined;
-
   // console.log("sellerInfo:", sellerInfo);
 
   //Version

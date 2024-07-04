@@ -83,7 +83,7 @@ declare namespace IProduct {
     categoryId: number;
     categoryName?: string;
     productMedias: ProductMedia[];
-    productOptions:IProOption[]
+    productOptions: IProOption[];
     shopId: number;
     video?: string;
     updatedAt: string;
@@ -149,5 +149,39 @@ declare namespace IProduct {
     id: number;
     price: number;
     afterDiscount: number;
+  }
+
+  //My Category API
+  export interface IlistCategory {
+    categories: Category[];
+  }
+
+  export interface Category {
+    _id: string;
+    cate_id: string;
+    name: string;
+    description: string;
+    image: string;
+    createdAt: string;
+    updatedAt: string;
+  }
+
+  export interface IproductList {
+    products: Product[];
+  }
+
+  export interface Product {
+    _id: string;
+    name: string;
+    description: string;
+    price: number;
+    cate_id: string;
+    quantity: number;
+    image: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+    isProductIdIncluded?: boolean;
   }
 }

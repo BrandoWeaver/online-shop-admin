@@ -5,8 +5,6 @@ import { PiUserCircleThin } from 'react-icons/pi';
 
 import { Box, Grid, Typography } from '@mui/material';
 
-import theme from 'themes';
-
 interface Icus {
   customerName: string | undefined;
   customerContact: string | undefined;

@@ -1,13 +1,14 @@
-import { memo, useState } from 'react';
+import ErrorResponse from 'ErrorRespone';
 import { useRequest, useUpdateEffect } from 'ahooks';
+import { memo, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { Button, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { MdCheck, MdClose, MdEdit } from 'react-icons/md';
+
+import { Button, Grid, IconButton, Stack, Typography } from '@mui/material';
 
 import { PRODUCT_API } from 'api/Product';
 
 import { LoadingSpiner } from 'components/Loading';
-import ErrorResponse from 'ErrorRespone';
 
 import { ISelectetOpts } from '../';
 import RenderRow from './RenderRow';
@@ -65,7 +66,7 @@ const Variants = ({
     {
       manual: true,
       onError: (err) => console.log(err),
-    }
+    },
   );
 
   const { loading: loadingAddProVariantOpt, run: runAddProVariantOpt } =
@@ -110,7 +111,7 @@ const Variants = ({
         const variant = listProductVariants[index];
         const stillExist = data.variants.find(
           (v) =>
-            v.level === variant.level && !data?.removedVar?.includes(v.level)
+            v.level === variant.level && !data?.removedVar?.includes(v.level),
         );
         if (stillExist) {
           if (variant.group_title !== stillExist.groupTitle) {
@@ -251,18 +252,18 @@ const Variants = ({
                               : {
                                   ...prev,
                                   [pv.group_title]: data,
-                                }
+                                },
                           );
                         },
                         onDeleteClick: () => {
                           setValue(
                             'removedVar',
-                            watchRemovedVars.concat(pv.level)
+                            watchRemovedVars.concat(pv.level),
                           );
                         },
                       }}
                     />
-                  )
+                  ),
               )}
               {watchNewVar && (
                 <RenderRow

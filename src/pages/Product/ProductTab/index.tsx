@@ -16,9 +16,10 @@ import ProductList from './ProductList';
 
 const ProductTab = () => {
   const { isSmDown } = useMQ();
+  const [productToUpdate, setProToUpdate] = useState<IProduct.Product>();
 
-  const [selectCate, setSelectCate] = useState<number | 'all'>(-1);
-  const [selectPro, setSelectPro] = useState<number | 'new'>(-1);
+  const [selectCate, setSelectCate] = useState<string | 'all'>('');
+  const [selectPro, setSelectPro] = useState<string | 'new'>('');
   const [edit, setEdit] = useState(false);
 
   const {
@@ -35,7 +36,8 @@ const ProductTab = () => {
   const allProduct = useMemo(
     () => {
       if (selectCate !== 'all') {
-        return listCategories?.find((cate) => cate.id === selectCate)?.products;
+        return listCategories?.find((cate) => cate.id === +selectCate)
+          ?.products;
       } else {
         return listCategories?.reduce(
           (acc, item) => [...acc, ...item.products],
@@ -50,7 +52,7 @@ const ProductTab = () => {
   const allCategory = useMemo(() => listCategories, [listCategories]);
 
   useEffect(() => {
-    if (selectCate !== -1 && selectPro !== -1 && selectPro !== 'new') {
+    if (selectCate !== '' && selectPro !== '' && selectPro !== 'new') {
       setEdit(false);
     }
   }, [selectCate, selectPro]);
@@ -111,16 +113,17 @@ const ProductTab = () => {
           height: 'inherit',
         }}
       >
-        {selectCate !== -1 && (
+        {selectCate !== '' && (
           <ProductList
             {...{
               shopId: 1,
               selectPro,
               setSelectPro,
-
+              selectCate,
               allProduct,
               allCategory,
-
+              productToUpdate,
+              setProToUpdate,
               errListCate,
               loadingListCate,
               refreshListCate,
@@ -131,8 +134,8 @@ const ProductTab = () => {
         )}
         {isSmDown && (
           <FullDialog
-            open={selectCate !== -1}
-            handleClose={() => setSelectCate(-1)}
+            open={selectCate !== ''}
+            handleClose={() => setSelectCate('')}
           >
             <Box
               sx={{
@@ -147,10 +150,11 @@ const ProductTab = () => {
                   shopId: 1,
                   selectPro,
                   setSelectPro,
-
+                  selectCate,
                   allProduct,
                   allCategory,
-
+                  productToUpdate,
+                  setProToUpdate,
                   errListCate,
                   loadingListCate,
                   refreshListCate,
@@ -174,7 +178,7 @@ const ProductTab = () => {
           height: 'inherit',
         }}
       >
-        {selectPro !== -1 && (
+        {selectPro !== '' && (
           <ProductDetail
             {...{
               selectCate,
@@ -185,13 +189,14 @@ const ProductTab = () => {
               refreshListCate,
               edit,
               setEdit,
+              productToUpdate,
             }}
           />
         )}
         {isSmDown && (
           <FullDialog
-            open={selectPro !== -1}
-            handleClose={() => setSelectPro(-1)}
+            open={selectPro !== ''}
+            handleClose={() => setSelectPro('')}
           >
             <Box
               sx={{
@@ -211,6 +216,7 @@ const ProductTab = () => {
                   refreshListCate,
                   edit,
                   setEdit,
+                  productToUpdate,
                 }}
               />
             </Box>

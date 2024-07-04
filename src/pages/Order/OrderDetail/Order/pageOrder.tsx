@@ -1,17 +1,8 @@
-import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
-import ErrorResponse from 'ErrorRespone';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 import { useRequest } from 'ahooks';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Grid,
-  Stack,
-  Typography,
-} from '@mui/material';
-import { Paper } from '@mui/material';
+import { Box, CircularProgress, Grid, Stack, Typography } from '@mui/material';
 
 import ORDER from 'api/Order';
 
@@ -21,16 +12,10 @@ import ErrDialog from 'components/Dialog/ErrDialog';
 import HttpUtil from 'utils/http-util';
 import { ROUTE_API } from 'utils/route-util';
 
-import theme from 'themes';
-
 import ConfrimBtn from './BtnBystatus/ConfirmBtn';
 import PendingBtn from './BtnBystatus/PendingBtn';
-import ReviewBtn from './BtnBystatus/ReviewBtn';
 import Customer from './Customer/Customer';
-import { SelectLocation } from './DeliveryLocation/SaveLocation';
-import SelectMap from './DeliveryLocation/SelectMap';
 import DialogCancel from './Dialog/DialogCancel';
-import DialogLocation from './Dialog/DialogLocation';
 import Driver from './Driver/Driver';
 import TopCom from './OrderID';
 import PaymentMethod from './Payment/Payment';
@@ -71,26 +56,14 @@ interface Iorder {
   errListDetail: Error | undefined;
 }
 export const defaultCoord = { lat: 11.5752538, lng: 104.9000484 };
-const libraries: ('places' | 'visualization' | 'drawing' | 'geometry')[] = [
-  'places',
-  'visualization',
-];
 const containerStyle = {
   width: '100%',
   height: '400px',
 };
 function OrderPage(props: Iorder) {
   const errRef = useRef<IErrDialogRef>(null);
-  // const { selectedShop } = React.useContext(AuthContext);
   const [editId, setEditId] = useState<number | ''>();
-  const [selectMap, setSelectMap] = useState(true);
   const [cancel, setCancel] = useState(false);
-  const [open, setOpen] = useState(false);
-  // const [rejectOrder, setRejectOrder] = useState(false);
-  const [buyerAddressId, setBuyerAddressId] = useState<number>();
-  const [openSavedAddr, setOpenSavedAddr] = useState(false);
-  const [label, setLabel] = useState<string>('');
-  const [edit, setEdit] = useState(false);
 
   const { run: runDeleteProduct, loading: loadDeleteProduct } = useRequest(
     (data) =>
@@ -109,81 +82,10 @@ function OrderPage(props: Iorder) {
       },
     },
   );
-
-  const { run: runUpdateQty } = useRequest(
-    (orderDetailId, qty) =>
-      HttpUtil.post(ROUTE_API.updateOrderQty.replace(':id', `${1}`), {
-        orderDetailId: orderDetailId,
-        qty: qty,
-      }),
-    {
-      manual: true,
-      onError: (e) => errRef.current?.open(e),
-      onSuccess: () => {
-        props.refDetail();
-        setEditId('');
-      },
-    },
-  );
-
-  const { runAsync: runUpdateOrder } = useRequest(
-    (id) => ORDER.updateOrder(`${props.detailId}`, 'proccessing'),
-    {
-      manual: true,
-      onError: (e) => errRef.current?.open(e),
-      onSuccess: () => {
-        props.refDetail();
-        setSelectMap(false);
-        setEdit(false);
-        props.refreshOrderList();
-      },
-    },
-  );
-
-  const { runAsync: runAddress } = useRequest(
-    () =>
-      ORDER.runUpdateAdrr(
-        `${1}`,
-        `${props.customerContact}`,
-        props.currentAdd,
-        props.location || 'home',
-        props.centerMap,
-      ),
-    {
-      manual: true,
-      onError: (e) => errRef.current?.open(e),
-      onSuccess: (data) => {
-        const newIdAddr =
-          data?.buyerAddresses?.[data?.buyerAddresses?.length - 1]?.id;
-        if (newIdAddr) {
-          runUpdateOrder(newIdAddr);
-          refreshListAddr();
-        }
-      },
-    },
-  );
-
-  const {
-    data: listAddress,
-    refresh: refreshListAddr,
-    loading: loadListAddr,
-    error: errListAddr,
-  } = useRequest(
-    () => ORDER.runListAddress(`${1}`, `${props.customerContact}`),
-    {
-      ready: props.customerContact ? true : false,
-      refreshDeps: [props.customerContact],
-    },
-  );
-  //useCallback use with fn
-  const handleSetBuyerAddressId = useCallback(
-    (id: number) => setBuyerAddressId(id),
-    [],
-  );
   const {
     data: orderDetail,
     loading: listDetailLoading,
-    refresh: refDetail,
+
     error: errListDetail,
   } = useRequest(() => ORDER.getOrderInfo(`${props.detailId}`), {
     onSuccess: (data) => {
@@ -229,16 +131,6 @@ function OrderPage(props: Iorder) {
           >
             <div></div>
           </Stack>
-          {/* <ErrorResponse
-            message={
-              errListDetail.message ||
-              errListDetail.error ||
-              errListDetail.error_description
-            }
-            typographyProps={{ textAlign: 'center' }}
-            buttonAction={props.refDetail}
-            height='calc(100vh - 200px)'
-          /> */}
         </>
       ) : (
         <Grid container>
@@ -305,7 +197,6 @@ function OrderPage(props: Iorder) {
           <ShopingBage
             editId={editId}
             setEditId={setEditId}
-            runUpdateQty={runUpdateQty}
             runDeleteProduct={runDeleteProduct}
             detailId={props.detailId}
             orderDetails={orderDetail}
@@ -348,68 +239,14 @@ function OrderPage(props: Iorder) {
           )}
         </Grid>
       )}
-      {/* <DialogReject
-        rejectOrder={rejectOrder}
-        setRejectOrder={setRejectOrder}
-        id={props.detailId}
-        refreshOrderList={props.refreshOrderList}
-        setOrder={props.setOrder}
-        // setOpen={props.setOpen}
-        setId={props.setId}
-      /> */}
       <DialogCancel
         setOrder={props.setOrder}
         cancel={cancel}
         setCancel={setCancel}
         id={props.detailId}
         refreshOrderList={props.refreshOrderList}
-        // setOpen={props.setOpen}
         setId={props.setId}
       />
-      {/* <ShopingBage
-        editId={editId}
-        setEditId={setEditId}
-        runUpdateQty={runUpdateQty}
-        runDeleteProduct={runDeleteProduct}
-        detailId={props.detailId}
-        orderDetails={orderDetail?.items}
-        refDetail={props.refDetail}
-        listLoading={props.loading}
-        loadDeleteProduct={loadDeleteProduct}
-      /> */}
-      {/* {props.status === 'review' ? (
-            <ReviewBtn
-              setCancel={setCancel}
-              id={props.detailId}
-              refreshOrderList={props.refreshOrderList}
-              setOrder={props.setOrder}
-              refreshListDetail={props.refDetail}
-              // setOpen={props.setOpen}
-              setId={props.setId}
-            />
-          ) : props.status === 'pending' ? (
-            // <PendingBtn
-            //   setRejectOrder={setRejectOrder}
-            //   id={props.detailId}
-            //   refreshOrderList={props.refreshOrderList}
-            //   setOrder={props.setOrder}
-            //   refreshListDetail={props.refDetail}
-            //   // setOpen={props.setOpen}
-            //   setId={props.setId}
-            // />
-            <></>
-          ) : (
-            props.status === 'confirmed' && (
-              <ConfrimBtn
-                id={props.detailId}
-                refreshOrderList={props.refreshOrderList}
-                setOrder={props.setOrder}
-                refreshListDetail={props.refDetail}
-                // setOpen={props.setOpen}
-                setId={props.setId}
-              />
-            )
-          )} */}
     </Box>
   );
 }

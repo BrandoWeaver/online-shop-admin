@@ -97,4 +97,8 @@ export const ROUTE_API = {
   //payment
   listShopPayment: '/api/payments/listpayment',
   addShopPayment: '/api/payments/create',
+  updateShopPayment: '/api/payments/edit/:id',
+  //category
+  listCategory: '/api/categories',
+  listProduct: '/api/products',
 };

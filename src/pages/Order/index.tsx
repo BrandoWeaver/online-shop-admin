@@ -64,7 +64,6 @@ const Order = () => {
   const [activeOrder, setActiveOrder] = React.useState('activeOrder');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const [page, setPage] = useState(0);
   const [mapCenter, setMapCenter] = useState<ICoord>(defaultCoord);
   const [address, setAddress] = useState<string>();
   const searchRef = useRef<ISearchRef>(null);
@@ -115,9 +114,6 @@ const Order = () => {
     },
     refreshDeps: [orderStatus],
   });
-  useEffect(() => {
-    setPage(0);
-  }, [active]);
 
   const {
     data: listHistory,

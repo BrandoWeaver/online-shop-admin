@@ -1,14 +1,13 @@
-import { Fragment, memo } from 'react';
+import { memo } from 'react';
 import {
   MdOutlineFeaturedPlayList,
   MdOutlineHome,
   MdOutlineLocalMall,
   MdOutlineStore,
-  MdPersonOutline,
 } from 'react-icons/md';
 import { matchPath, useLocation, useNavigate } from 'react-router';
 
-import { AppBar, Avatar, Button, IconButton } from '@mui/material';
+import { AppBar, Avatar, Button } from '@mui/material';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Stack from '@mui/material/Stack';
