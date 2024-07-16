@@ -1,15 +1,7 @@
 import { memo, useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { MdPhotoCamera } from 'react-icons/md';
 
-import {
-  Avatar,
-  Button,
-  IconButton,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Avatar, Button, Stack, TextField, Typography } from '@mui/material';
 
 import { LoadingSpiner } from 'components/Loading';
 

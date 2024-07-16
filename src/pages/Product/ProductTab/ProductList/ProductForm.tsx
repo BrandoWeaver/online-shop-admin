@@ -52,23 +52,16 @@ const CreateProductForm = (props: createProps) => {
       onError: (err) => errAlert.current?.open(err),
     },
   );
-  const { run: runEditProduct, loading: loadingEditProduct } = useRequest(
-    PRODUCT_API.editProduct,
-    {
-      manual: true,
-      onSuccess: (data) => {
-        props.setSelectPro('');
-        props.refreshProduct();
-      },
-      onError: (err) => errAlert.current?.open(err),
+  const { run: runEditProduct } = useRequest(PRODUCT_API.editProduct, {
+    manual: true,
+    onSuccess: (data) => {
+      props.setSelectPro('');
+      props.refreshProduct();
     },
-  );
+    onError: (err) => errAlert.current?.open(err),
+  });
 
-  const {
-    data: listCategories,
-    loading: loadingListCate,
-    error: errListCate,
-  } = useRequest(PRODUCT_API.listCategory);
+  const { data: listCategories } = useRequest(PRODUCT_API.listCategory);
   const {
     control,
     handleSubmit,

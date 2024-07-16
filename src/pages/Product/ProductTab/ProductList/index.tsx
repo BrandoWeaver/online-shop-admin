@@ -1,13 +1,6 @@
-import { useDebounce, useRequest } from 'ahooks';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { useDrop } from 'react-dnd';
-import {
-  MdDelete,
-  MdDragIndicator,
-  MdEdit,
-  MdOutlineExpandCircleDown,
-  MdSearch,
-} from 'react-icons/md';
+import { useRequest } from 'ahooks';
+import { memo, useRef, useState } from 'react';
+import { MdDelete, MdDragIndicator, MdEdit, MdSearch } from 'react-icons/md';
 
 import {
   Box,
@@ -15,7 +8,6 @@ import {
   Divider,
   IconButton,
   InputAdornment,
-  List,
   ListItem,
   ListItemButton,
   ListItemText,
@@ -30,7 +22,6 @@ import { PRODUCT_API } from 'api/Product';
 import { CusTextField } from 'components/CusMuiComp/CusInputs';
 import ConfDialog, { IConfDialogRef } from 'components/Dialog/ConfDialog';
 import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
-import DragableListItem from 'components/DragableList/ListItem';
 import { BackdropLoading, LoadingSpiner } from 'components/Loading';
 
 export interface IDragDropItem {
@@ -79,13 +70,6 @@ const ProductList = ({
   const errAlert = useRef<IErrDialogRef>(null);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { run: runRearrangeProduct } = useRequest(
-    PRODUCT_API.rearrangeProduct,
-    {
-      manual: true,
-      ready: Boolean(shopId),
-    },
-  );
 
   const { run: runDeleteProduct, loading: loadingDeleteProduct } = useRequest(
     PRODUCT_API.deleteProduct,
@@ -98,37 +82,9 @@ const ProductList = ({
       },
     },
   );
-
-  const [, drop] = useDrop(
-    () => ({
-      accept: dragDropItemType,
-      drop(item: IDragDropItem) {
-        if (shopId) {
-          runRearrangeProduct(shopId, {
-            id: item.id,
-            sort: item.index + 1,
-          });
-        }
-      },
-    }),
-    [shopId],
-  );
-
   const handleAddNew = () => {
     setSelectPro('new');
   };
-
-  // if (loadingProductList) {
-  //   return (
-  //     <Stack
-  //       justifyContent='center'
-  //       alignItems='center'
-  //       height='calc(100vh - 250px)'
-  //     >
-  //       <LoadingSpiner />
-  //     </Stack>
-  //   );
-  // }
 
   return (
     <>

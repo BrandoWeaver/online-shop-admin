@@ -86,6 +86,9 @@ const Order = () => {
     onSuccess: (data) => {
       console.log('orderDetail:');
     },
+    onError: () => {
+      errRef.current?.open('Error Occured');
+    },
   });
   const handleClose = () => {
     setPickDate(false);
@@ -112,6 +115,9 @@ const Order = () => {
     onSuccess: (data) => {
       console.log('dataListOrder', data);
     },
+    onError: () => {
+      errRef.current?.open('Error Occured');
+    },
     refreshDeps: [orderStatus],
   });
 
@@ -125,7 +131,9 @@ const Order = () => {
       setPickDate(false);
       console.log('history', data);
     },
-    onError: (err) => {},
+    onError: (err) => {
+      errRef.current?.open('Error Occured');
+    },
     refreshDeps: [startDate, endDate, orderStatus],
   });
   const { data: dataHistory, loading: loadingBystatus } = useRequest(
@@ -135,7 +143,9 @@ const Order = () => {
         setPickDate(false);
         console.log('summ', data);
       },
-      onError: (err) => {},
+      onError: (err) => {
+        errRef.current?.open('Error Occured');
+      },
 
       refreshDeps: [startDate, endDate],
     },

@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { Badge, Button, Grid } from '@mui/material';
-
-import theme from 'themes';
+import { Grid } from '@mui/material';
 
 interface Ibnt {
   setOrder: React.Dispatch<React.SetStateAction<string>>;

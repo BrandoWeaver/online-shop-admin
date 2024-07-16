@@ -1,13 +1,6 @@
 import { useDebounce, useRequest } from 'ahooks';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { useDrop } from 'react-dnd';
-import {
-  MdDelete,
-  MdDragIndicator,
-  MdEdit,
-  MdOutlineExpandCircleDown,
-  MdSearch,
-} from 'react-icons/md';
+import { memo, useEffect, useRef, useState } from 'react';
+import { MdDelete, MdDragIndicator, MdEdit, MdSearch } from 'react-icons/md';
 
 import {
   Box,
@@ -31,8 +24,7 @@ import { CusTextField } from 'components/CusMuiComp/CusInputs';
 import ConfDialog, { IConfDialogRef } from 'components/Dialog/ConfDialog';
 import CusDialog, { ICusDialogHandler } from 'components/Dialog/CusDialog';
 import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
-import DragableListItem from 'components/DragableList/ListItem';
-import { BackdropLoading, LoadingSpiner } from 'components/Loading';
+import { LoadingSpiner } from 'components/Loading';
 
 import CategoryForm from './CateForm';
 
@@ -80,6 +72,9 @@ const Categories = ({
   } = useRequest(() => PRODUCT_API.rearrangeCategory(debouncedText), {
     onSuccess: (data) => {
       console.log('My Cate', data);
+    },
+    onError: () => {
+      errAlert.current?.open('Error Occured');
     },
     refreshDeps: [debouncedText],
   });

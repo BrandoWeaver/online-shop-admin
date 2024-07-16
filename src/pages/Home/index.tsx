@@ -1,9 +1,12 @@
 import { useRequest } from 'ahooks';
+import { useRef } from 'react';
 
 import { Avatar, Grid, Paper, Stack, Typography } from '@mui/material';
 
 import ORDER from 'api/Order';
 import SHOP_PERFORMANCE from 'api/ShopPerformance';
+
+import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
 
 const DashboardItem = ({
   title,
@@ -49,11 +52,15 @@ const DashboardItem = ({
 };
 
 const Home = () => {
+  const errRef = useRef<IErrDialogRef>(null);
   const { data: dataShopPerformance } = useRequest(
     SHOP_PERFORMANCE.shopPerformance,
     {
       onSuccess: (data) => {
         console.log('data', data);
+      },
+      onError: () => {
+        errRef.current?.open('Error Occured');
       },
     },
   );
@@ -61,10 +68,15 @@ const Home = () => {
     onSuccess: (data) => {
       console.log('data', data);
     },
+    onError: () => {
+      errRef.current?.open('Error Occured');
+    },
   });
 
   return (
     <Grid container spacing={2} sx={{ p: [2, 2, 3] }}>
+      <ErrDialog ref={errRef} />
+
       <Grid item xs={12} md={7}>
         <Paper variant='outlined' sx={{ p: 2, bgcolor: 'common.white' }}>
           <Typography

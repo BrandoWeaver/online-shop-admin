@@ -1,16 +1,10 @@
-import { useRequest } from 'ahooks';
-import { memo, useRef, useState } from 'react';
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import { memo, useState } from 'react';
 
-import { Box, Button, Stack } from '@mui/material';
-
-import { PRODUCT_API } from 'api/Product';
+import { Box } from '@mui/material';
 
 import { StyledTab, StyledTabs } from 'components/CusMuiComp/CusTabs';
-import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
 
 import ProductDetailPage from '../ProductList/ProductDetail';
-import ProductForm from '../ProductList/ProductForm';
 import CreateProductForm from '../ProductList/ProductForm';
 
 export interface IProductForm
@@ -37,80 +31,16 @@ interface IProductDetail {
 }
 
 const ProductDetail = ({
-  selectCate,
   selectPro,
   setSelectPro,
-  refreshListCate,
-  setSelectCate,
   edit,
   setEdit,
   productToUpdate,
-  loadingProductList,
-  allListProduct,
   refreshProduct,
 }: IProductDetail) => {
-  const errAlert = useRef<IErrDialogRef>(null);
-
   const [active, setActive] = useState(0);
-
-  // const { run: runAddNewProduct, loading: loadingAddNewProduct } = useRequest(
-  //   PRODUCT_API.addNewProduct,
-  //   {
-  //     manual: true,
-  //     ready: selectPro === 'new',
-  //     onSuccess: (data) => {
-  //       // console.log('addNewProduct onSuccess:', data);
-  //       refreshListCate();
-  //       setSelectCate(+data.categoryId);
-  //       setSelectPro(data.id);
-  //       setEdit(false);
-  //     },
-  //     onError: (err) => errAlert.current?.open(err),
-  //   },
-  // );
-
-  // const { run: runEditProduct, loading: loadingEditProduct } = useRequest(
-  //   PRODUCT_API.editProduct,
-  //   {
-  //     manual: true,
-  //     ready: selectPro !== 'new',
-  //     onSuccess: (data) => {
-  //       // console.log('editProduct onSuccess:', data);
-  //       setEdit(false);
-  //       refreshListCate();
-  //       setSelectCate(+data.categoryId);
-  //       setSelectPro(data.id);
-  //       mutateProductDetail(data);
-  //     },
-  //     onError: (err) => errAlert.current?.open(err),
-  //   },
-  // );
-
-  // console.log('productDetail:', productDetail);
-  // console.log('errGetProDetail:', errGetProDetail);
-
-  const methods = useForm<IProductForm>({ shouldUnregister: true });
-
-  const onSubmit: SubmitHandler<IProductForm> = ({
-    discount,
-    thumbnailFile,
-    videoFile,
-    productMedias,
-    ...data
-  }) => {
-    console.log('onSubmit', data);
-  };
-
-  const onCancelClick = () => {
-    if (selectPro === 'new') {
-      setSelectPro('');
-    }
-    setEdit(false);
-  };
   return (
     <>
-      {/* <ErrDialog ref={errAlert} /> */}
-
       <Box sx={{ px: [0, 0, 2], top: 0 }}>
         <StyledTabs
           value={active}
@@ -137,18 +67,6 @@ const ProductDetail = ({
               },
             }}
           />
-          {/* <StyledTab
-            label='Variants'
-            sx={{
-              minWidth: 'auto',
-              py: 2,
-              px: 0,
-              color: 'text.disabled',
-              '&.Mui-selected': {
-                color: 'text.secondary',
-              },
-            }}
-          /> */}
         </StyledTabs>
       </Box>
 

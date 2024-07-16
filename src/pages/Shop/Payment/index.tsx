@@ -18,6 +18,7 @@ import PAYMENT_API from 'api/Payment';
 
 import ConfirmDialog from 'components/Dialog/ConfirmDialog';
 import CusDialog, { ICusDialogHandler } from 'components/Dialog/CusDialog';
+import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
 import ErrorDialog from 'components/Dialog/ErrorDialog';
 import { LoadingSpiner } from 'components/Loading';
 
@@ -26,6 +27,7 @@ import theme from 'themes';
 import PaymentForm from './CreatePaymentForm';
 
 function Payment() {
+  const errAlert = useRef<IErrDialogRef>(null);
   const [deletePay, setDeletePayment] = useState('');
   const [open, setOpen] = useState(false);
   const [updateData, setUpdateData] = useState<Ipayment.Root2>();
@@ -37,6 +39,7 @@ function Payment() {
     onSuccess: (data) => {
       console.log('listPayment', data);
     },
+    onError: (err) => errAlert.current?.open(err),
   });
   const { run: deletePayment, loading: loadingDeletePayment } = useRequest(
     (id: string) => PAYMENT_API.deletePayment(id),
@@ -46,9 +49,7 @@ function Payment() {
         refreshListBank();
         setDeletePayment('');
       },
-      onError: () => {
-        setOpen(true);
-      },
+      onError: (err) => errAlert.current?.open(err),
     },
   );
 
@@ -57,9 +58,7 @@ function Payment() {
     onSuccess: () => {
       refreshListBank();
     },
-    onError: () => {
-      setOpen(true);
-    },
+    onError: (err) => errAlert.current?.open(err),
   });
   const cateFormRef = useRef<ICusDialogHandler>(null);
   const handleOpen = () => {
@@ -74,9 +73,7 @@ function Payment() {
         cateFormRef.current?.close();
         refreshListBank();
       },
-      onError: (error) => {
-        console.error('Error adding payment:', error);
-      },
+      onError: (err) => errAlert.current?.open(err),
     },
   );
   return (
@@ -86,6 +83,7 @@ function Payment() {
         p: 2,
       }}
     >
+      <ErrDialog ref={errAlert} />
       <ConfirmDialog
         title='Delete Payment'
         onCancel={() => setDeletePayment('')}

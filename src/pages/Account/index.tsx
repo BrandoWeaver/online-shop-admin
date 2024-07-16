@@ -1,10 +1,11 @@
 import { useRequest } from 'ahooks';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { MdPermIdentity } from 'react-icons/md';
 
 import { Alert, Box, Button, Snackbar, Typography } from '@mui/material';
 
+import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
 import ErrorDialog from 'components/Dialog/ErrorDialog';
 import { BackdropLoading } from 'components/Loading';
 
@@ -18,7 +19,7 @@ const Account = () => {
   const [succOpen, setOpenSucc] = useState(false);
   const [accOpen, setaccOpen] = useState(false);
   const method = useForm<IformAcc>();
-
+  const errRef = useRef<IErrDialogRef>(null);
   const {
     error: errUpdatePass,
 
@@ -31,7 +32,9 @@ const Account = () => {
       }),
     {
       manual: true,
-      onError: () => setOpenErr(true),
+      onError: () => {
+        errRef.current?.open('Error Occured');
+      },
       onSuccess: () => {
         setOpenSucc(true);
       },
@@ -41,7 +44,9 @@ const Account = () => {
     async (data) => HttpUtil.post(ROUTE_API.editSellerInfo, data),
     {
       manual: true,
-      onError: (err) => console.log('Upadate', err),
+      onError: (err) => {
+        errRef.current?.open('Error Occured');
+      },
       onSuccess: () => {
         setaccOpen(true);
       },
@@ -68,6 +73,7 @@ const Account = () => {
 
   return (
     <Box px={{ xs: 2, md: 7 }} py={{ xs: 0, md: 2 }} mb={{ xs: 10, md: 0 }}>
+      <ErrDialog ref={errRef} />
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={accOpen}

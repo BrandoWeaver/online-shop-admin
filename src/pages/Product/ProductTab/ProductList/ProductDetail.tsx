@@ -1,15 +1,6 @@
 import React from 'react';
 
-import {
-  Box,
-  Card,
-  CardContent,
-  CardMedia,
-  Container,
-  Grid,
-  Typography,
-} from '@mui/material';
-import { styled } from '@mui/system';
+import { CardMedia, Container, Grid, Typography } from '@mui/material';
 
 interface ProductDetailProps {
   name?: string;

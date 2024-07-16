@@ -1,11 +1,12 @@
 import { useDebounce, useRequest } from 'ahooks';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 
 import { PRODUCT_API } from 'api/Product';
 
+import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
 import FullDialog from 'components/Dialog/FullDialog';
 
 import useMQ from 'hooks/useMQ';
@@ -18,7 +19,7 @@ const ProductTab = () => {
   const { isSmDown } = useMQ();
   const [productToUpdate, setProToUpdate] = useState<IProduct.IProductNew>();
   const [searchText, setSearchText] = useState('');
-
+  const errRef = useRef<IErrDialogRef>(null);
   const debouncedText = useDebounce(searchText, { wait: 500 });
   const [selectCate, setSelectCate] = useState<string | 'all'>('');
   const [selectPro, setSelectPro] = useState<string | 'new'>('');
@@ -31,6 +32,9 @@ const ProductTab = () => {
     mutate: mutateListCate,
     refresh: refreshListCate,
   } = useRequest(PRODUCT_API.listCategory, {
+    onError: (err) => {
+      errRef.current?.open(err);
+    },
     cacheKey: `get-shop-${1}-categories`,
     refreshDeps: [selectCate],
   });
@@ -52,6 +56,7 @@ const ProductTab = () => {
     },
     onError: (err) => {
       console.log('errRes', err);
+      errRef.current?.open(err);
     },
     refreshDeps: [selectCate, debouncedText],
   });
@@ -70,6 +75,7 @@ const ProductTab = () => {
         borderRadius: 2,
       }}
     >
+      <ErrDialog ref={errRef} />
       <Grid
         item
         xs={12}

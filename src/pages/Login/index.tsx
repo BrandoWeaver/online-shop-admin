@@ -54,6 +54,7 @@ const Login = () => {
       },
       onError: (err) => {
         console.log('errRes', err);
+        errRef.current?.open('Error Occured');
       },
     },
   );
