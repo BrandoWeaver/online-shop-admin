@@ -57,6 +57,7 @@ function Navbar({ drawerWidth }: Props) {
       onSuccess: (data) => {
         console.log('data', data);
       },
+      pollingInterval: 5000,
     },
   );
   return (
