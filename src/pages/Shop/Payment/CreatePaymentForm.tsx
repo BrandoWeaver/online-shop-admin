@@ -221,9 +221,6 @@ function PaymentForm({
             type='submit'
             variant='contained'
             color='primary'
-            startIcon={
-              loadingAddPayment ? <CircularProgress size={20} /> : null
-            }
             disabled={loadingAddPayment}
             sx={{
               fontSize: { xs: 14, md: 16 },
