@@ -1,9 +1,16 @@
+import { useRequest } from 'ahooks';
 import { memo, useRef, useState } from 'react';
 import { MdChevronRight, MdLogout, MdOutlineHome } from 'react-icons/md';
 import { matchPath, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
-import { Avatar, Breadcrumbs, Link as MuiLink, Tooltip } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  Breadcrumbs,
+  Link as MuiLink,
+  Tooltip,
+} from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -11,6 +18,8 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 
 import { useAuthContext } from 'contexts/AuthContext';
+
+import SHOP_PERFORMANCE from 'api/ShopPerformance';
 
 import ConfDialog, { IConfDialogRef } from 'components/Dialog/ConfDialog';
 
@@ -42,7 +51,14 @@ function Navbar({ drawerWidth }: Props) {
   const onConfirmLogout = () => {
     setAuthState((prev) => ({ authed: false, rememberMe: prev.rememberMe }));
   };
-
+  const { data: dataShopPerformance } = useRequest(
+    SHOP_PERFORMANCE.shopIncome,
+    {
+      onSuccess: (data) => {
+        console.log('data', data);
+      },
+    },
+  );
   return (
     <AppBar
       elevation={0}
@@ -66,6 +82,7 @@ function Navbar({ drawerWidth }: Props) {
           <Typography variant='h6' fontWeight={600} gutterBottom>
             {matched?.title === 'Home' ? 'Dashboard' : matched?.title}
           </Typography>
+
           {matched?.title !== 'Home' && (
             <Breadcrumbs
               separator={<MdChevronRight />}
@@ -89,6 +106,13 @@ function Navbar({ drawerWidth }: Props) {
         </Stack>
 
         <Stack flexGrow={1} />
+        <Box
+          mr={2}
+          fontWeight={'bold'}
+          sx={{ display: { xs: 'none', md: 'flex' } }}
+        >
+          Totoal Income: {dataShopPerformance?.data.totalIncome || 0}$
+        </Box>
         <Tooltip
           open={open}
           onOpen={() => setOpen(true)}

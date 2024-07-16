@@ -9,6 +9,13 @@ const SHOP_PERFORMANCE = {
     console.log('res', res);
     return res.data;
   },
+  shopIncome: async () => {
+    const res = await HttpUtil.get<IshopPerformance.TotalIncome>(
+      ROUTE_API.getTotalIncome,
+    );
+    console.log('res', res);
+    return res.data;
+  },
 };
 
 export default SHOP_PERFORMANCE;

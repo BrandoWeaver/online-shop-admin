@@ -1,4 +1,7 @@
+import { memo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { MdAdd, MdClose } from 'react-icons/md';
+
 import {
   Autocomplete,
   Avatar,
@@ -13,21 +16,16 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import { MdAdd, MdClose } from 'react-icons/md';
 
 import { CusTextField } from 'components/CusMuiComp/CusInputs';
 import InputFile from 'components/InputFile';
-import { InventoryStatusLabel, InventoryStatusEnum } from 'utils/data-util';
+import TextEditor from 'components/TextEditor';
+
+import { InventoryStatusEnum, InventoryStatusLabel } from 'utils/data-util';
 
 import { IProductForm } from '../index';
-import TextEditor from 'components/TextEditor';
-import { memo } from 'react';
 
-const ProductForm = ({
-  allCategory,
-}: {
-  allCategory?: IProduct.IProCategory[];
-}) => {
+const ProductForm = () => {
   const theme = useTheme();
   const { control, getValues, setValue, watch } =
     useFormContext<IProductForm>();
@@ -262,7 +260,7 @@ const ProductForm = ({
             *
           </Typography>
         </Typography>
-        <Controller
+        {/* <Controller
           control={control}
           defaultValue={''}
           name='categoryId'
@@ -292,7 +290,7 @@ const ProductForm = ({
               )}
             />
           )}
-        />
+        /> */}
       </Stack>
 
       <Stack>
@@ -342,7 +340,7 @@ const ProductForm = ({
           validate: (val) =>
             (val || [])?.length +
               watchMedias.filter(
-                (m) => !watchDeletedIds?.includes(m.id.toString())
+                (m) => !watchDeletedIds?.includes(m.id.toString()),
               ).length >
             0,
         }}
@@ -387,8 +385,8 @@ const ProductForm = ({
                           setValue(
                             'deletedIds',
                             (getValues('deletedIds') || [])?.concat(
-                              media.id.toString()
-                            )
+                              media.id.toString(),
+                            ),
                           );
                         }}
                         sx={{
@@ -405,7 +403,7 @@ const ProductForm = ({
                         <MdClose />
                       </IconButton>
                     </Box>
-                  )
+                  ),
               )}
               {value?.map((v, index) => (
                 <Box key={index} position='relative'>

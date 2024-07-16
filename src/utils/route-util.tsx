@@ -22,6 +22,7 @@ export const ROUTE_API = {
   root: process.env.REACT_APP_API_URL,
   login: '/api/auth/login',
   getShopPerformance: '/api/orders/performance/weakly-performance',
+  getTotalIncome: '/api/orders/total/total-income',
   getOrderActive: '/api/orders/orderStatus/status-counts',
   listOrder: '/api/orders',
   summary: '/api/orders/history/summary',
@@ -44,9 +45,8 @@ export const ROUTE_API = {
   productList: '/seller/shop/:id/product/list',
   getProductDetail: '/seller/shop/:id/product/detail/:proId',
   rearrangeProduct: '/seller/shop/:id/product/rearrange',
-  updateProduct: '/seller/shop/:id/product/update',
+  updateProduct: '/api/products/:id',
   addNewProduct: '/seller/shop/:id/product/create',
-  deleteProduct: '/seller/shop/:id/product/delete/:proId',
 
   listProductVariant: '/seller/shop/:id/product/:proId/variant/list',
   deleteProductVariant: '/seller/shop/:id/product/:proId/variant/delete',
@@ -69,10 +69,9 @@ export const ROUTE_API = {
   addNewCollection: '/seller/shop/:id/collection/create',
   deleteCollection: '/seller/shop/:id/collection/:colId/delete',
 
-  listProCate: '/seller/shop/:id/category/list',
   rearrangeProCate: '/seller/shop/:id/category/rearrange',
   addProCate: '/seller/shop/:id/category/add',
-  editProCate: '/seller/shop/:id/category/update',
+
   deleteProCate: '/seller/shop/:id/category/delete/:cateId',
 
   getShopInfo: '/seller/shop/:id/info',
@@ -101,4 +100,13 @@ export const ROUTE_API = {
   //category
   listCategory: '/api/categories',
   listProduct: '/api/products',
+  createCategory: '/api/product-categories',
+  editCategory: '/api/categories/:id',
+  deleteCategory: '/api/categories/:id',
+  //product
+  createProduct: '/api/products',
+  listProCate: '/api/categories',
+  editProduct: '/api/products/:id',
+  editProCate: '/api/categories/:id',
+  deleteProduct: '/api/products/:id',
 };

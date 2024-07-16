@@ -26,4 +26,14 @@ declare namespace IshopPerformance {
     completed: number;
     cancelled: number;
   }
+
+  export interface TotalIncome {
+    message: string;
+    data: Data;
+  }
+
+  export interface Data {
+    totalIncome: number;
+    totalOrders: number;
+  }
 }

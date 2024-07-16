@@ -1,4 +1,3 @@
-import ErrorResponse from 'ErrorRespone';
 import { useDebounce, useRequest } from 'ahooks';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
@@ -45,45 +44,41 @@ interface IProductList {
   shopId?: number;
   selectPro: string | 'new';
   setSelectPro: React.Dispatch<React.SetStateAction<string | 'new'>>;
-
   allProduct?: IProduct.Product[];
-  allCategory?: IProduct.IProCategory[];
   selectCate: string;
   loadingListCate: boolean;
   errListCate?: Error;
   refreshListCate: () => void;
   disableAdd: boolean;
   setEdit: React.Dispatch<React.SetStateAction<boolean>>;
-  productToUpdate: IProduct.Product | undefined;
+  loadingProductList: boolean;
+  allListProduct: IProduct.IproductListNew | undefined;
+  refreshProduct: () => void;
+  setSearchText: React.Dispatch<React.SetStateAction<string>>;
+  searchText: string;
   setProToUpdate: React.Dispatch<
-    React.SetStateAction<IProduct.Product | undefined>
+    React.SetStateAction<IProduct.IProductNew | undefined>
   >;
 }
 
 const ProductList = ({
   shopId,
-  allProduct,
-  loadingListCate,
-  errListCate,
-  selectCate,
   selectPro,
   setSelectPro,
   refreshListCate,
   disableAdd,
   setEdit,
-  productToUpdate,
+  searchText,
+  loadingProductList,
+  allListProduct,
+  refreshProduct,
+  setSearchText,
   setProToUpdate,
 }: IProductList) => {
   const deleteAlert = useRef<IConfDialogRef>(null);
   const errAlert = useRef<IErrDialogRef>(null);
-  const [products, setProducts] = useState<IProduct.Product[]>(
-    allProduct || [],
-  );
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [searchText, setSearchText] = useState('');
-
-  const debouncedText = useDebounce(searchText, { wait: 500 });
-
   const { run: runRearrangeProduct } = useRequest(
     PRODUCT_API.rearrangeProduct,
     {
@@ -91,56 +86,17 @@ const ProductList = ({
       ready: Boolean(shopId),
     },
   );
-  const { loading: loadingProductList, data: allListProduct } = useRequest(
-    () => PRODUCT_API.listProducts(selectCate),
-    {
-      onSuccess: (data) => {
-        console.log('SuccessResListProduct', data);
-      },
-      onError: (err) => {
-        console.log('errRes', err);
-      },
-      refreshDeps: [selectCate],
-    },
-  );
 
   const { run: runDeleteProduct, loading: loadingDeleteProduct } = useRequest(
     PRODUCT_API.deleteProduct,
     {
       manual: true,
-      ready: Boolean(shopId),
       onError: (err) => errAlert.current?.open(err),
-      onSuccess: refreshListCate,
+      onSuccess: () => {
+        refreshListCate();
+        refreshProduct();
+      },
     },
-  );
-
-  const findCard = useCallback(
-    (id: string) => {
-      const card = products?.filter((pro) => `${pro.id}` === id)[0];
-      if (card) {
-        return {
-          index: products?.indexOf(card),
-        };
-      } else {
-        return { card, index: -1 };
-      }
-    },
-    [products],
-  );
-
-  const moveCard = useCallback(
-    (id: number, atIndex: number) => {
-      const { index } = findCard(id.toString());
-
-      if (products) {
-        setProducts((prev) => {
-          let arr = [...(prev || [])];
-          arr.splice(atIndex, 0, arr.splice(index, 1)[0]);
-          return arr;
-        });
-      }
-    },
-    [setProducts, products, findCard],
   );
 
   const [, drop] = useDrop(
@@ -159,32 +115,8 @@ const ProductList = ({
   );
 
   const handleAddNew = () => {
-    // const newPro: IProduct.Product = {
-    //   thumbnail: '',
-    //   id: 'new',
-    //   name: 'New Product',
-    //   price: 0,
-    //   afterDiscount: 0,
-    //   sort: 0,
-    //   checkoutLink: '',
-    // };
-    // setProducts((prev) =>
-    //   prev.find((p) => p.id !== 'new') ? [newPro, ...prev] : prev
-    // );
     setSelectPro('new');
   };
-
-  useEffect(() => {
-    if (allProduct) {
-      setProducts(allProduct);
-    }
-  }, [allProduct]);
-
-  useEffect(() => {
-    if (selectPro === '') {
-      setProducts((prev) => prev.filter((p) => p.id !== 'new'));
-    }
-  }, [selectPro]);
 
   if (loadingProductList) {
     return (
@@ -198,18 +130,6 @@ const ProductList = ({
     );
   }
 
-  // if (errListCate) {
-  //   return (
-  //     <ErrorResponse
-  //       message={
-  //         errListCate.error_description ||
-  //         errListCate.error ||
-  //         errListCate.message
-  //       }
-  //       buttonAction={refreshListCate}
-  //     />
-  //   );
-  // }
   return (
     <>
       <BackdropLoading open={loadingDeleteProduct} />
@@ -220,7 +140,7 @@ const ProductList = ({
         ref={deleteAlert}
         onConfirm={(data) => {
           console.log('onConfirm:', data);
-          shopId && runDeleteProduct(shopId, data);
+          runDeleteProduct(selectPro);
           deleteAlert.current?.close();
         }}
       />
@@ -247,26 +167,26 @@ const ProductList = ({
           }}
         />
       </Box>
-      {allListProduct?.products.map((e, i) => {
-        return (
-          <>
+
+      <Box mt={2} sx={{ height: 'calc(100vh - 380px)' }}>
+        {allListProduct?.products.length !== 0 ? (
+          allListProduct &&
+          allListProduct.products.map((e, i) => (
             <ListItem
               disablePadding
               key={e._id}
               secondaryAction={
                 <Stack direction='row' spacing={0.25} color='text.secondary'>
-                  {/* <IconButton color='inherit' size='small'>
-                    <MdOutlineExpandCircleDown />
-                  </IconButton> */}
-
                   <IconButton
                     color='inherit'
                     size='small'
                     sx={{
                       cursor: 'move',
                     }}
-                    onClick={(e) => {
-                      setAnchorEl(e.currentTarget);
+                    onClick={(event) => {
+                      setAnchorEl(event.currentTarget);
+                      setSelectPro(e._id);
+                      setProToUpdate(e);
                     }}
                   >
                     <MdDragIndicator />
@@ -282,6 +202,8 @@ const ProductList = ({
                 }}
                 sx={{
                   px: [0, 0, 2],
+                  bgcolor: selectPro === e._id ? 'background.paper' : '',
+                  color: selectPro === e._id ? 'primary.main' : '',
                 }}
               >
                 <ListItemText
@@ -293,10 +215,19 @@ const ProductList = ({
                 />
               </ListItemButton>
             </ListItem>
-          </>
-        );
-      })}
-      <List
+          ))
+        ) : (
+          <Stack
+            justifyContent='center'
+            alignItems='center'
+            height='calc(100vh - 400px)'
+          >
+            <Typography>No products found.</Typography>
+          </Stack>
+        )}
+      </Box>
+
+      {/* <List
         ref={drop}
         sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}
       >
@@ -312,28 +243,8 @@ const ProductList = ({
             }}
           />
         )}
-        {products
-          ?.filter((pro) =>
-            pro.name.toUpperCase().includes(debouncedText.toUpperCase()),
-          )
-          ?.map((pro, i) => (
-            <DragableListItem
-              key={pro.id}
-              {...{
-                type: dragDropItemType,
-                id: pro.id,
-                index: i,
-                title: pro.name,
-                active: selectPro === pro.id,
-                onClick: () =>
-                  // setSelectPro((prev) => (prev === pro.id ? -1 : pro.id)),
-                  findCard,
-                moveCard,
-                onMenuClick: (e) => setAnchorEl(e.currentTarget),
-              }}
-            />
-          ))}
-      </List>
+      </List> */}
+
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -352,9 +263,7 @@ const ProductList = ({
       >
         <MenuItem
           onClick={() => {
-            // console.log('anchorEl:', anchorEl?.id);
             if (anchorEl) {
-              setSelectPro(anchorEl?.id);
               setEdit(true);
             }
             setAnchorEl(null);
@@ -389,6 +298,7 @@ const ProductList = ({
           Delete
         </MenuItem>
       </Menu>
+
       <Stack justifyContent='center' alignItems='center' my={2}>
         <Button
           variant='contained'
@@ -401,4 +311,5 @@ const ProductList = ({
     </>
   );
 };
+
 export default memo(ProductList);

@@ -42,12 +42,14 @@ const Login = () => {
       manual: true,
       onSuccess: (data) => {
         console.log('SuccessRes', data);
-        if (data.token) {
+        if (data.user.usertype !== 'user') {
           setAuthState({
             authed: true,
             rememberMe: watch('rememberMe'),
             ...data,
           });
+        } else {
+          alert("You don't have permission to manage this shop");
         }
       },
       onError: (err) => {

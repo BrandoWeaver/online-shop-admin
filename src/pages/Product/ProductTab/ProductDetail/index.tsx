@@ -19,7 +19,6 @@ export interface IProductForm
   videoFile: File | string;
   thumbnailFile: File | string;
   productMedias: IProduct.ProductMedia[];
-
   deletedIds?: string[];
   show: boolean;
 }
@@ -27,13 +26,14 @@ interface IProductDetail {
   selectCate: string | 'all';
   selectPro: string | 'new';
   setSelectPro: React.Dispatch<React.SetStateAction<string | 'new'>>;
-
-  allCategory?: IProduct.IProCategory[];
   refreshListCate: () => void;
   setSelectCate: React.Dispatch<React.SetStateAction<string | 'all'>>;
-  productToUpdate: IProduct.Product | undefined;
+  productToUpdate: IProduct.IProductNew | undefined;
   edit: boolean;
   setEdit: React.Dispatch<React.SetStateAction<boolean>>;
+  loadingProductList: boolean;
+  allListProduct: IProduct.IproductListNew | undefined;
+  refreshProduct: () => void;
 }
 
 const ProductDetail = ({
@@ -42,12 +42,13 @@ const ProductDetail = ({
   setSelectPro,
   refreshListCate,
   setSelectCate,
-  allCategory,
   edit,
   setEdit,
   productToUpdate,
+  loadingProductList,
+  allListProduct,
+  refreshProduct,
 }: IProductDetail) => {
-  // console.log('ProductDetail:', allCategory);
   const errAlert = useRef<IErrDialogRef>(null);
 
   const [active, setActive] = useState(0);
@@ -106,7 +107,6 @@ const ProductDetail = ({
     }
     setEdit(false);
   };
-
   return (
     <>
       {/* <ErrDialog ref={errAlert} /> */}
@@ -178,8 +178,13 @@ const ProductDetail = ({
                 }}
               />
             )} */}
-            {selectPro === 'new' ? (
-              <CreateProductForm />
+            {selectPro === 'new' || edit ? (
+              <CreateProductForm
+                setSelectPro={setSelectPro}
+                refreshProduct={refreshProduct}
+                productToUpdate={productToUpdate}
+                proId={selectPro}
+              />
             ) : (
               <ProductDetailPage {...productToUpdate} />
             )}

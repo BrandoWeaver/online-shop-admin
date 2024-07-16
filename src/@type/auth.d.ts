@@ -10,6 +10,7 @@ declare namespace IAuth {
     username: string;
     email: string;
     phone: string;
+    usertype: string;
   }
   interface ILoginReq {
     username: string;

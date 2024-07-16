@@ -1,33 +1,75 @@
+import { memo, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Button, Stack, TextField, Typography } from '@mui/material';
-import { memo } from 'react';
+import { MdPhotoCamera } from 'react-icons/md';
+
+import {
+  Avatar,
+  Button,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
+
+import { LoadingSpiner } from 'components/Loading';
 
 interface IAddCategoryForm {
   name: string;
+  image: File | null;
 }
 
 const CategoryForm = ({
-  params,
   onAddSubmit,
   onEditSubmit,
   onCancel,
+  loading,
+  cateToUpdate,
+  cateId,
 }: {
-  params?: IProduct.Category;
-  onAddSubmit: (data: { name: string }) => void;
-  onEditSubmit: (data: { id: number; name: string }) => void;
+  cateId: string;
+  onAddSubmit: (data: {
+    name: string;
+    image: File | null;
+    des?: string;
+  }) => void;
+  onEditSubmit: (
+    cateId: string,
+    data: {
+      name: string;
+      image: File | null;
+      des?: string;
+    },
+  ) => void;
   onCancel: () => void;
+  loading: boolean;
+  cateToUpdate: IProduct.Category | undefined;
 }) => {
-  const { control, handleSubmit } = useForm<IAddCategoryForm>({
-    shouldUnregister: true,
-  });
+  const { control, handleSubmit } = useForm<IAddCategoryForm>();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const onSubmit: SubmitHandler<IAddCategoryForm> = (data) => {
-    if (params) {
-      onEditSubmit({ id: params.id, name: data.name });
+    if (cateToUpdate) {
+      onEditSubmit(cateId, data);
     } else {
       onAddSubmit(data);
     }
+    // console.log('data', data);
   };
+
+  console.log('para', cateToUpdate);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  console.log('infoorm', cateToUpdate);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -39,7 +81,7 @@ const CategoryForm = ({
           align='center'
           mb={2}
         >
-          {!params ? 'Add' : 'Edit'} Category
+          {!cateToUpdate ? 'Add' : 'Edit'} Category
         </Typography>
         <Typography gutterBottom>
           Category Name{' '}
@@ -49,7 +91,7 @@ const CategoryForm = ({
         </Typography>
         <Controller
           control={control}
-          defaultValue={params?.name || ''}
+          defaultValue={cateToUpdate?.name || ''}
           name='name'
           rules={{ required: true }}
           render={({ field, fieldState: { error } }) => (
@@ -57,12 +99,53 @@ const CategoryForm = ({
           )}
         />
 
+        <Typography gutterBottom mt={2}>
+          Category Image
+        </Typography>
+        <Stack direction='row' alignItems='center' spacing={2}>
+          <Avatar
+            src={imagePreview || (cateToUpdate ? cateToUpdate.image : '')}
+            alt='Category Image'
+            sx={{ width: 56, height: 56 }}
+            variant='rounded'
+          />
+          <Button variant='contained' component='label'>
+            Upload Image
+            <Controller
+              name='image'
+              control={control}
+              defaultValue={null}
+              render={({
+                field: { onChange, value },
+                fieldState: { error },
+              }) => (
+                <input
+                  type='file'
+                  accept='image/*'
+                  hidden
+                  onChange={(e) => {
+                    onChange(e.target.files?.[0]);
+                    handleImageChange(e);
+                    console.log('e', e.target.files?.[0]);
+                  }}
+                />
+              )}
+            />
+          </Button>
+        </Stack>
+
         <Stack direction='row' justifyContent='center' spacing={2} mt={2}>
           <Button onClick={onCancel} sx={{ minWidth: 100 }}>
             Cancel
           </Button>
           <Button type='submit' variant='contained' sx={{ minWidth: 100 }}>
-            {!params ? 'Add' : 'Save'}
+            {loading ? (
+              <LoadingSpiner size={20} />
+            ) : cateToUpdate ? (
+              'Edit'
+            ) : (
+              'Save'
+            )}
           </Button>
         </Stack>
       </Stack>

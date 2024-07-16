@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useRequest } from 'ahooks';
+import React, { useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 import {
@@ -15,6 +16,11 @@ import {
   Typography,
 } from '@mui/material';
 
+import { PRODUCT_API } from 'api/Product';
+
+import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
+import { LoadingSpiner } from 'components/Loading';
+
 // Define interface for form data
 interface ProductFormData {
   name: string;
@@ -23,10 +29,46 @@ interface ProductFormData {
   quantity: string;
   image: File | null;
   status: string;
+  cate_id: string;
+}
+interface createProps {
+  setSelectPro: React.Dispatch<React.SetStateAction<string>>;
+  refreshProduct: () => void;
+  productToUpdate: IProduct.IProductNew | undefined;
+  proId: string;
 }
 
-const CreateProductForm: React.FC = () => {
+const CreateProductForm = (props: createProps) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const errAlert = useRef<IErrDialogRef>(null);
+  const { run: runAddNewProduct, loading: loadingAddNewProduct } = useRequest(
+    PRODUCT_API.addProduct,
+    {
+      manual: true,
+      onSuccess: (data) => {
+        props.setSelectPro('');
+        props.refreshProduct();
+      },
+      onError: (err) => errAlert.current?.open(err),
+    },
+  );
+  const { run: runEditProduct, loading: loadingEditProduct } = useRequest(
+    PRODUCT_API.editProduct,
+    {
+      manual: true,
+      onSuccess: (data) => {
+        props.setSelectPro('');
+        props.refreshProduct();
+      },
+      onError: (err) => errAlert.current?.open(err),
+    },
+  );
+
+  const {
+    data: listCategories,
+    loading: loadingListCate,
+    error: errListCate,
+  } = useRequest(PRODUCT_API.listCategory);
   const {
     control,
     handleSubmit,
@@ -35,8 +77,14 @@ const CreateProductForm: React.FC = () => {
 
   const onSubmit: SubmitHandler<ProductFormData> = (data) => {
     // Handle form submission with typed data
-    console.log(data);
+    console.log('editdata', data);
+    if (props.productToUpdate) {
+      runEditProduct(props.proId, data);
+    } else {
+      runAddNewProduct(data);
+    }
   };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -47,8 +95,10 @@ const CreateProductForm: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
+
   return (
     <Container maxWidth='sm'>
+      <ErrDialog ref={errAlert} />
       <Box
         component='form'
         sx={{
@@ -60,10 +110,45 @@ const CreateProductForm: React.FC = () => {
         }}
         onSubmit={handleSubmit(onSubmit)}
       >
+        <Grid container alignItems='center' spacing={2}>
+          <Grid item>
+            <Avatar
+              alt='Product Image'
+              src={imagePreview || props.productToUpdate?.image || ''}
+              sx={{ width: 100, height: 100 }}
+              variant='rounded'
+            />
+          </Grid>
+          <Grid item>
+            <Button variant='contained' component='label'>
+              Upload Image
+              <Controller
+                name='image'
+                control={control}
+                defaultValue={null}
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error },
+                }) => (
+                  <input
+                    type='file'
+                    accept='image/*'
+                    hidden
+                    onChange={(e) => {
+                      onChange(e.target.files?.[0]);
+                      handleImageChange(e);
+                      console.log('e', e.target.value);
+                    }}
+                  />
+                )}
+              />
+            </Button>
+          </Grid>
+        </Grid>
         <Controller
           name='name'
           control={control}
-          defaultValue=''
+          defaultValue={props.productToUpdate?.name || ''}
           rules={{ required: 'Name is required' }}
           render={({ field }) => (
             <TextField
@@ -80,7 +165,7 @@ const CreateProductForm: React.FC = () => {
         <Controller
           name='description'
           control={control}
-          defaultValue=''
+          defaultValue={props.productToUpdate?.description || ''}
           rules={{ required: 'Description is required' }}
           render={({ field }) => (
             <TextField
@@ -99,7 +184,7 @@ const CreateProductForm: React.FC = () => {
         <Controller
           name='price'
           control={control}
-          defaultValue=''
+          defaultValue={props.productToUpdate?.price.toString() || ''}
           rules={{
             required: 'Price is required',
             pattern: {
@@ -123,7 +208,7 @@ const CreateProductForm: React.FC = () => {
         <Controller
           name='quantity'
           control={control}
-          defaultValue=''
+          defaultValue={props.productToUpdate?.quantity.toString() || ''}
           rules={{
             required: 'Quantity is required',
             pattern: {
@@ -144,43 +229,12 @@ const CreateProductForm: React.FC = () => {
           )}
         />
 
-        <Grid container alignItems='center' spacing={2}>
-          <Grid item>
-            <Avatar
-              alt='Product Image'
-              src={imagePreview || ''}
-              sx={{ width: 100, height: 100 }}
-              variant='rounded'
-            />
-          </Grid>
-          <Grid item>
-            <Button variant='contained' component='label'>
-              Upload Image
-              <Controller
-                name='image'
-                control={control}
-                defaultValue={null}
-                render={({ field: { onChange } }) => (
-                  <input
-                    type='file'
-                    hidden
-                    onChange={(e) => {
-                      onChange(e);
-                      handleImageChange(e);
-                    }}
-                  />
-                )}
-              />
-            </Button>
-          </Grid>
-        </Grid>
-
         <FormControl fullWidth>
           <InputLabel>Status</InputLabel>
           <Controller
             name='status'
             control={control}
-            defaultValue=''
+            defaultValue={props.productToUpdate?.status || ''}
             rules={{ required: 'Status is required' }}
             render={({ field }) => (
               <Select
@@ -189,11 +243,8 @@ const CreateProductForm: React.FC = () => {
                 error={!!errors.status}
                 fullWidth
               >
-                <MenuItem value=''>
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value='available'>Available</MenuItem>
-                <MenuItem value='unavailable'>Unavailable</MenuItem>
+                <MenuItem value='active'>active</MenuItem>
+                <MenuItem value='inactive'>inactive</MenuItem>
               </Select>
             )}
           />
@@ -202,8 +253,35 @@ const CreateProductForm: React.FC = () => {
           )}
         </FormControl>
 
+        <FormControl fullWidth>
+          <InputLabel>Category</InputLabel>
+          <Controller
+            name='cate_id'
+            control={control}
+            defaultValue={props.productToUpdate?.cate_id || ''}
+            rules={{ required: 'Category is required' }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                label='Category'
+                error={!!errors.cate_id}
+                fullWidth
+              >
+                {listCategories?.categories.map((value, i) => {
+                  return (
+                    <MenuItem value={value.cate_id}>{value.name}</MenuItem>
+                  );
+                })}
+              </Select>
+            )}
+          />
+          {errors.cate_id && (
+            <Typography color='error'>{errors.cate_id.message}</Typography>
+          )}
+        </FormControl>
+
         <Button type='submit' variant='contained' color='primary'>
-          Submit
+          {loadingAddNewProduct ? <LoadingSpiner size={20} /> : 'Submit'}
         </Button>
       </Box>
     </Container>

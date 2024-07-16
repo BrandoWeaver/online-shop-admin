@@ -7,13 +7,6 @@ const AUTH = {
     console.log('res', res);
     return res.data;
   },
-
-  // getSellerInfo: async (shopId?: number) => {
-  //   const res = await HttpUtil.get<IAuth.ISellerInfo>(ROUTE_API.getSellerInfo, {
-  //     params: { shopId },
-  //   });
-  //   return res.data;
-  // },
 };
 
 export default AUTH;

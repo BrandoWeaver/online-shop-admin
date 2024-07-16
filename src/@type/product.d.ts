@@ -33,12 +33,18 @@ declare namespace IProduct {
     totalCount: number;
   }
 
-  interface IProCategory {
-    id: number;
+  export interface ICategoryProduct {
+    categories: Category[];
+  }
+
+  export interface Category {
+    _id: string;
+    cate_id: string;
     name: string;
-    sort: number;
-    show: boolean;
-    products: Product[];
+    description: string;
+    image: string;
+    createdAt: string;
+    updatedAt: string;
   }
 
   interface Product {
@@ -166,11 +172,11 @@ declare namespace IProduct {
     updatedAt: string;
   }
 
-  export interface IproductList {
-    products: Product[];
+  export interface IproductListNew {
+    products: IProductNew[];
   }
 
-  export interface Product {
+  export interface IProductNew {
     _id: string;
     name: string;
     description: string;
@@ -183,5 +189,30 @@ declare namespace IProduct {
     updatedAt: string;
     __v: number;
     isProductIdIncluded?: boolean;
+  }
+
+  // create pro
+  interface ICreate {
+    name: string;
+    description: string;
+    price: string;
+    quantity: string;
+    image: File | null;
+    status: string;
+    cate_id: string;
+  }
+  // cate
+  export interface IlistCategory {
+    categories: Category[];
+  }
+
+  export interface Category {
+    _id: string;
+    cate_id: string;
+    name: string;
+    description: string;
+    image: string;
+    createdAt: string;
+    updatedAt: string;
   }
 }

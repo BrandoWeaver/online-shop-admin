@@ -31,7 +31,7 @@ function StepButton(prop: Ibnt) {
       }}
     >
       <Grid item xs={4}>
-        <Button
+        {/* <Button
           variant='outlined'
           sx={{
             borderRadius: 3,
@@ -50,10 +50,10 @@ function StepButton(prop: Ibnt) {
           }}
         >
           Order
-        </Button>
+        </Button> */}
       </Grid>
       <Grid item xs={4}>
-        <Button
+        {/* <Button
           variant='outlined'
           sx={{
             borderRadius: 3,
@@ -78,10 +78,10 @@ function StepButton(prop: Ibnt) {
           >
             Note
           </Badge>
-        </Button>
+        </Button> */}
       </Grid>
       <Grid item xs={4}>
-        <Button
+        {/* <Button
           variant='outlined'
           sx={{
             borderRadius: 3,
@@ -100,7 +100,7 @@ function StepButton(prop: Ibnt) {
           }}
         >
           Tracking
-        </Button>
+        </Button> */}
       </Grid>
     </Grid>
   );

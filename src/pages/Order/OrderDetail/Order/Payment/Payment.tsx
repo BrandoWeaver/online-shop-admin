@@ -133,7 +133,7 @@ function PaymentMethod(props: Ipayment) {
               },
             }}
           /> */}
-          Button
+
           <Typography
             fontWeight={'bold'}
             sx={{

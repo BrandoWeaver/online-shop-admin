@@ -1,4 +1,3 @@
-import ErrorResponse from 'ErrorRespone';
 import { useDebounce, useRequest } from 'ahooks';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
@@ -25,6 +24,7 @@ import {
   Typography,
 } from '@mui/material';
 
+import CategoryAPI from 'api/Category';
 import { PRODUCT_API } from 'api/Product';
 
 import { CusTextField } from 'components/CusMuiComp/CusInputs';
@@ -48,16 +48,6 @@ interface ICategories {
   selectCate: string | 'all';
   setSelectCate: React.Dispatch<React.SetStateAction<string | 'all'>>;
   setSelectPro: React.Dispatch<React.SetStateAction<string | 'new'>>;
-
-  mutateListCate: (
-    data?:
-      | IProduct.IProCategory[]
-      | ((
-          oldData?: IProduct.IProCategory[] | undefined,
-        ) => IProduct.IProCategory[] | undefined)
-      | undefined,
-  ) => void;
-  allCategory?: IProduct.IProCategory[];
   loadingListCate: boolean;
   errListCate?: Error;
   refreshListCate: () => void;
@@ -66,13 +56,9 @@ interface ICategories {
 
 const Categories = ({
   shopId,
-
-  allCategory,
   loadingListCate,
   errListCate,
   refreshListCate,
-  mutateListCate,
-
   selectCate,
   setSelectCate,
   setSelectPro,
@@ -84,25 +70,29 @@ const Categories = ({
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchText, setSearchText] = useState('');
-
+  const [cateToUpdate, setCateToUpdate] = useState<IProduct.Category>();
   const debouncedText = useDebounce(searchText, { wait: 500 });
 
-  const { run: runRearrangeCategory, data: listCategories } = useRequest(
-    PRODUCT_API.rearrangeCategory,
-    {
-      onSuccess: (data) => {
-        console.log('My Cate', data);
-      },
+  const {
+    loading: loadingCategory,
+    data: listCategories,
+    refresh: refreshListCategories,
+  } = useRequest(() => PRODUCT_API.rearrangeCategory(debouncedText), {
+    onSuccess: (data) => {
+      console.log('My Cate', data);
     },
-  );
+    refreshDeps: [debouncedText],
+  });
 
   const { run: runAddCategory, loading: loadingAddCategory } = useRequest(
     PRODUCT_API.addNewCategory,
     {
       manual: true,
-      ready: Boolean(shopId),
       onError: (err) => errAlert.current?.open(err),
-      onSuccess: refreshListCate,
+      onSuccess: () => {
+        refreshListCategories();
+        cateFormRef.current?.close();
+      },
     },
   );
 
@@ -112,65 +102,24 @@ const Categories = ({
       manual: true,
       ready: Boolean(shopId),
       onError: (err) => errAlert.current?.open(err),
-      onSuccess: refreshListCate,
+      onSuccess: () => {
+        cateFormRef.current?.close();
+        refreshListCategories();
+        setCateToUpdate(undefined);
+      },
     },
   );
 
   const { run: runDeleteCategory, loading: loadingDeleteCategory } = useRequest(
-    PRODUCT_API.deleteCategory,
+    () => CategoryAPI.deleteCategory(selectCate),
     {
       manual: true,
-      ready: Boolean(shopId),
       onError: (err) => errAlert.current?.open(err),
-      onSuccess: refreshListCate,
+      onSuccess: refreshListCategories,
     },
   );
 
-  const findCard = useCallback(
-    (id: string) => {
-      const card = allCategory?.filter((cate) => `${cate.id}` === id)[0];
-      if (card) {
-        return {
-          index: allCategory?.indexOf(card),
-        };
-      } else {
-        return { card, index: -1 };
-      }
-    },
-    [allCategory],
-  );
-
-  const moveCard = useCallback(
-    (id: number, atIndex: number) => {
-      const { index } = findCard(id.toString());
-
-      if (allCategory) {
-        mutateListCate((prev) => {
-          let arr = [...(prev || [])];
-          arr.splice(atIndex, 0, arr.splice(index, 1)[0]);
-          return arr;
-        });
-      }
-    },
-    [mutateListCate, allCategory, findCard],
-  );
-
-  // const [, drop] = useDrop(
-  //   () => ({
-  //     accept: dragDropItemType,
-  //     drop(item: IDragDropItem) {
-  //       if (shopId) {
-  //         runRearrangeCategory(shopId, {
-  //           id: item.id,
-  //           sort: item.index + 1,
-  //         });
-  //       }
-  //     },
-  //   }),
-  //   [shopId],
-  // );
-
-  if (!allCategory && loadingListCate) {
+  if (loadingCategory) {
     return (
       <Stack
         justifyContent='center'
@@ -181,29 +130,18 @@ const Categories = ({
       </Stack>
     );
   }
-
-  // if (errListCate) {
-  //   return (
-  //     <ErrorResponse
-  //       message={
-  //         errListCate.error_description ||
-  //         errListCate.error ||
-  //         errListCate.message
-  //       }
-  //       buttonAction={refreshListCate}
-  //     />
-  //   );
-  // }
+  console.log('param index', cateToUpdate);
   return (
     <>
-      <BackdropLoading
+      {/* <BackdropLoading
         open={
           loadingAddCategory ||
           loadingDeleteCategory ||
           loadingListCate ||
-          loadingEditCategory
+          loadingEditCategory ||
+          loadingCategory
         }
-      />
+      /> */}
 
       <ErrDialog ref={errAlert} />
 
@@ -211,26 +149,19 @@ const Categories = ({
         ref={deleteAlert}
         onConfirm={(data) => {
           console.log('onConfirm:', data);
-          shopId && runDeleteCategory(shopId, data);
+          shopId && runDeleteCategory();
           deleteAlert.current?.close();
         }}
       />
 
       <CusDialog ref={cateFormRef}>
         <CategoryForm
-          onAddSubmit={(data) => {
-            if (shopId) {
-              runAddCategory(shopId, data);
-            }
-            cateFormRef.current?.close();
-          }}
-          onEditSubmit={(data) => {
-            if (shopId) {
-              runEditCategory(shopId, data);
-            }
-            cateFormRef.current?.close();
-          }}
+          cateToUpdate={cateToUpdate}
+          loading={loadingAddCategory || loadingEditCategory}
+          onAddSubmit={runAddCategory}
+          onEditSubmit={runEditCategory}
           onCancel={() => cateFormRef.current?.close()}
+          cateId={selectCate}
         />
       </CusDialog>
 
@@ -256,88 +187,71 @@ const Categories = ({
           }}
         />
       </Box>
-      {listCategories?.categories?.map((e, i) => {
-        return (
-          <Box>
-            <ListItem
-              disablePadding
-              key={e._id}
-              secondaryAction={
-                <Stack direction='row' spacing={0.25} color='text.secondary'>
-                  {/* <IconButton color='inherit' size='small'>
-                    <MdOutlineExpandCircleDown />
-                  </IconButton> */}
 
-                  <IconButton
-                    color='inherit'
-                    size='small'
-                    sx={{
-                      cursor: 'move',
-                    }}
-                    onClick={(e) => setAnchorEl(e.currentTarget)}
+      <Box mt={2}>
+        {listCategories?.categories?.length !== 0 ? (
+          <Box sx={{ height: 'calc(100vh - 390px)', overflow: 'scroll' }}>
+            {listCategories &&
+              listCategories.categories.map((e, i) => (
+                <Box key={e._id}>
+                  <ListItem
+                    disablePadding
+                    secondaryAction={
+                      <Stack
+                        direction='row'
+                        spacing={0.25}
+                        color='text.secondary'
+                      >
+                        <IconButton
+                          color='inherit'
+                          size='small'
+                          sx={{ cursor: 'move' }}
+                          onClick={(event) => {
+                            console.log(cateToUpdate);
+                            setAnchorEl(event.currentTarget);
+                            setSelectCate(e.cate_id);
+                          }}
+                        >
+                          <MdDragIndicator />
+                        </IconButton>
+                      </Stack>
+                    }
                   >
-                    <MdDragIndicator />
-                  </IconButton>
-                </Stack>
-              }
-            >
-              <ListItemButton
-                onClick={() => setSelectCate(e.cate_id)}
-                sx={{
-                  px: [0, 0, 2],
-                  // bgcolor: active ? 'background.paper' : '',
-                  // color: active ? 'primary.main' : '',
-                }}
-              >
-                <ListItemText
-                  primary={e.name}
-                  primaryTypographyProps={{
-                    noWrap: true,
-                    sx: { maxWidth: '90%' },
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
+                    <ListItemButton
+                      onClick={() => {
+                        setSelectCate(e.cate_id);
+                        setCateToUpdate(e);
+                      }}
+                      sx={{
+                        px: [0, 0, 2],
+                        bgcolor:
+                          selectCate === e.cate_id ? 'background.paper' : '',
+                        color: selectCate === e.cate_id ? 'primary.main' : '',
+                      }}
+                    >
+                      <ListItemText
+                        primary={e.name}
+                        primaryTypographyProps={{
+                          noWrap: true,
+                          sx: { maxWidth: '90%' },
+                        }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                </Box>
+              ))}
           </Box>
-        );
-      })}
-      {/* <List
-        // ref={drop}
-        sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}
-      >
-        <DragableListItem
-          {...{
-            type: dragDropItemType,
-            id: 'all',
-            index: -1,
-            title: 'All',
-            active: selectCate === 'all',
-            onClick: () => {
-              setSelectCate((prev) => (prev === 'all' ? -1 : 'all'));
-              setSelectPro(-1);
-            },
-          }}
-        />
-        {listCategories?.categories.map((cate, i) => (
-          <DragableListItem
-            key={cate.id}
-            {...{
-              type: dragDropItemType,
-              id: cate.id,
-              index: i,
-              title: cate.name,
-              active: selectCate === cate.id,
-              onClick: () => {
-                setSelectCate((prev) => (prev === cate.id ? -1 : cate.id));
-                setSelectPro(-1);
-              },
-              findCard,
-              moveCard,
-              onMenuClick: (e) => setAnchorEl(e.currentTarget),
-            }}
-          />
-        ))}
-      </List> */}
+        ) : (
+          <Stack
+            justifyContent='center'
+            alignItems='center'
+            height='calc(100vh - 390px)'
+          >
+            <Typography>No categories found.</Typography>
+          </Stack>
+        )}
+      </Box>
+
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -345,27 +259,12 @@ const Categories = ({
         slotProps={{
           paper: { sx: { borderRadius: 1, bgcolor: 'common.white' } },
         }}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <MenuItem
           onClick={() => {
-            console.log('anchorEl:', anchorEl?.id);
-            setAnchorEl(null);
-            if (anchorEl?.id) {
-              const cate = allCategory?.find(
-                (cate) => cate.id === +anchorEl.id,
-              );
-              if (cate) {
-                cateFormRef.current?.open(cate);
-              }
-            }
+            cateFormRef.current?.open();
           }}
           sx={{
             '&>svg': { mr: 1.5 },
@@ -397,6 +296,7 @@ const Categories = ({
           Delete
         </MenuItem>
       </Menu>
+
       <Stack justifyContent='center' alignItems='center' my={2}>
         <Button
           variant='contained'
@@ -409,4 +309,5 @@ const Categories = ({
     </>
   );
 };
+
 export default memo(Categories);

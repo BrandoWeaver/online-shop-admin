@@ -1,4 +1,4 @@
-import { useRequest } from 'ahooks';
+import { useDebounce, useRequest } from 'ahooks';
 import { useEffect, useMemo, useState } from 'react';
 
 import Box from '@mui/material/Box';
@@ -16,8 +16,10 @@ import ProductList from './ProductList';
 
 const ProductTab = () => {
   const { isSmDown } = useMQ();
-  const [productToUpdate, setProToUpdate] = useState<IProduct.Product>();
+  const [productToUpdate, setProToUpdate] = useState<IProduct.IProductNew>();
+  const [searchText, setSearchText] = useState('');
 
+  const debouncedText = useDebounce(searchText, { wait: 500 });
   const [selectCate, setSelectCate] = useState<string | 'all'>('');
   const [selectPro, setSelectPro] = useState<string | 'new'>('');
   const [edit, setEdit] = useState(false);
@@ -28,26 +30,10 @@ const ProductTab = () => {
     error: errListCate,
     mutate: mutateListCate,
     refresh: refreshListCate,
-  } = useRequest(() => PRODUCT_API.listCategory(1), {
+  } = useRequest(PRODUCT_API.listCategory, {
     cacheKey: `get-shop-${1}-categories`,
-    ready: Boolean(1),
+    refreshDeps: [selectCate],
   });
-
-  const allProduct = useMemo(
-    () => {
-      if (selectCate !== 'all') {
-        return listCategories?.find((cate) => cate.id === +selectCate)
-          ?.products;
-      } else {
-        return listCategories?.reduce(
-          (acc, item) => [...acc, ...item.products],
-          [] as IProduct.Product[],
-        );
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectCate, listCategories],
-  );
 
   const allCategory = useMemo(() => listCategories, [listCategories]);
 
@@ -56,6 +42,19 @@ const ProductTab = () => {
       setEdit(false);
     }
   }, [selectCate, selectPro]);
+  const {
+    loading: loadingProductList,
+    data: allListProduct,
+    refresh: refreshProduct,
+  } = useRequest(() => PRODUCT_API.listProducts(selectCate, debouncedText), {
+    onSuccess: (data) => {
+      console.log('SuccessResListProduct', data);
+    },
+    onError: (err) => {
+      console.log('errRes', err);
+    },
+    refreshDeps: [selectCate, debouncedText],
+  });
 
   return (
     <Grid
@@ -81,6 +80,7 @@ const ProductTab = () => {
           display: 'flex',
           flexDirection: 'column',
           height: 'inherit',
+          overflow: 'scroll',
         }}
       >
         <CategoryList
@@ -111,6 +111,7 @@ const ProductTab = () => {
           display: { xs: 'none', md: 'flex' },
           flexDirection: 'column',
           height: 'inherit',
+          overflow: 'scroll',
         }}
       >
         {selectCate !== '' && (
@@ -120,7 +121,6 @@ const ProductTab = () => {
               selectPro,
               setSelectPro,
               selectCate,
-              allProduct,
               allCategory,
               productToUpdate,
               setProToUpdate,
@@ -129,6 +129,11 @@ const ProductTab = () => {
               refreshListCate,
               disableAdd: edit || selectCate === 'all',
               setEdit,
+              loadingProductList,
+              allListProduct,
+              refreshProduct,
+              setSearchText,
+              searchText,
             }}
           />
         )}
@@ -151,7 +156,6 @@ const ProductTab = () => {
                   selectPro,
                   setSelectPro,
                   selectCate,
-                  allProduct,
                   allCategory,
                   productToUpdate,
                   setProToUpdate,
@@ -160,6 +164,11 @@ const ProductTab = () => {
                   refreshListCate,
                   disableAdd: edit,
                   setEdit,
+                  loadingProductList,
+                  allListProduct,
+                  refreshProduct,
+                  searchText,
+                  setSearchText,
                 }}
               />
             </Box>
@@ -186,10 +195,14 @@ const ProductTab = () => {
               setSelectPro,
               allCategory,
               setSelectCate,
+              listCategories,
               refreshListCate,
               edit,
               setEdit,
               productToUpdate,
+              loadingProductList,
+              allListProduct,
+              refreshProduct,
             }}
           />
         )}
@@ -211,12 +224,15 @@ const ProductTab = () => {
                   selectCate,
                   selectPro,
                   setSelectPro,
-                  allCategory,
+                  listCategories,
                   setSelectCate,
                   refreshListCate,
                   edit,
                   setEdit,
                   productToUpdate,
+                  loadingProductList,
+                  allListProduct,
+                  refreshProduct,
                 }}
               />
             </Box>
