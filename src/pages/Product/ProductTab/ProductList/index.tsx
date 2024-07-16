@@ -118,17 +118,17 @@ const ProductList = ({
     setSelectPro('new');
   };
 
-  if (loadingProductList) {
-    return (
-      <Stack
-        justifyContent='center'
-        alignItems='center'
-        height='calc(100vh - 250px)'
-      >
-        <LoadingSpiner />
-      </Stack>
-    );
-  }
+  // if (loadingProductList) {
+  //   return (
+  //     <Stack
+  //       justifyContent='center'
+  //       alignItems='center'
+  //       height='calc(100vh - 250px)'
+  //     >
+  //       <LoadingSpiner />
+  //     </Stack>
+  //   );
+  // }
 
   return (
     <>
@@ -169,7 +169,15 @@ const ProductList = ({
       </Box>
 
       <Box mt={2} sx={{ height: 'calc(100vh - 380px)' }}>
-        {allListProduct?.products.length !== 0 ? (
+        {loadingProductList ? (
+          <Stack
+            justifyContent='center'
+            alignItems='center'
+            height='calc(100vh - 390px)'
+          >
+            <LoadingSpiner />
+          </Stack>
+        ) : allListProduct?.products.length !== 0 ? (
           allListProduct &&
           allListProduct.products.map((e, i) => (
             <ListItem

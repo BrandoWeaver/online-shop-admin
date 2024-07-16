@@ -119,17 +119,6 @@ const Categories = ({
     },
   );
 
-  if (loadingCategory) {
-    return (
-      <Stack
-        justifyContent='center'
-        alignItems='center'
-        height='calc(100vh - 250px)'
-      >
-        <LoadingSpiner />
-      </Stack>
-    );
-  }
   console.log('param index', cateToUpdate);
   return (
     <>
@@ -186,70 +175,77 @@ const Categories = ({
             ),
           }}
         />
-      </Box>
-
-      <Box mt={2}>
-        {listCategories?.categories?.length !== 0 ? (
-          <Box sx={{ height: 'calc(100vh - 390px)', overflow: 'scroll' }}>
-            {listCategories &&
-              listCategories.categories.map((e, i) => (
-                <Box key={e._id}>
-                  <ListItem
-                    disablePadding
-                    secondaryAction={
-                      <Stack
-                        direction='row'
-                        spacing={0.25}
-                        color='text.secondary'
-                      >
-                        <IconButton
-                          color='inherit'
-                          size='small'
-                          sx={{ cursor: 'move' }}
-                          onClick={(event) => {
-                            console.log(cateToUpdate);
-                            setAnchorEl(event.currentTarget);
-                            setSelectCate(e.cate_id);
-                          }}
+        <Box mt={2}>
+          {loadingCategory ? (
+            <Stack
+              justifyContent='center'
+              alignItems='center'
+              height='calc(100vh - 390px)'
+            >
+              <LoadingSpiner />
+            </Stack>
+          ) : listCategories?.categories?.length !== 0 ? (
+            <Box sx={{ height: 'calc(100vh - 390px)', overflow: 'scroll' }}>
+              {listCategories &&
+                listCategories.categories.map((e, i) => (
+                  <Box key={e._id}>
+                    <ListItem
+                      disablePadding
+                      secondaryAction={
+                        <Stack
+                          direction='row'
+                          spacing={0.25}
+                          color='text.secondary'
                         >
-                          <MdDragIndicator />
-                        </IconButton>
-                      </Stack>
-                    }
-                  >
-                    <ListItemButton
-                      onClick={() => {
-                        setSelectCate(e.cate_id);
-                        setCateToUpdate(e);
-                      }}
-                      sx={{
-                        px: [0, 0, 2],
-                        bgcolor:
-                          selectCate === e.cate_id ? 'background.paper' : '',
-                        color: selectCate === e.cate_id ? 'primary.main' : '',
-                      }}
+                          <IconButton
+                            color='inherit'
+                            size='small'
+                            sx={{ cursor: 'move' }}
+                            onClick={(event) => {
+                              console.log(cateToUpdate);
+                              setAnchorEl(event.currentTarget);
+                              setSelectCate(e.cate_id);
+                            }}
+                          >
+                            <MdDragIndicator />
+                          </IconButton>
+                        </Stack>
+                      }
                     >
-                      <ListItemText
-                        primary={e.name}
-                        primaryTypographyProps={{
-                          noWrap: true,
-                          sx: { maxWidth: '90%' },
+                      <ListItemButton
+                        onClick={() => {
+                          setSelectCate(e.cate_id);
+                          setCateToUpdate(e);
                         }}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                </Box>
-              ))}
-          </Box>
-        ) : (
-          <Stack
-            justifyContent='center'
-            alignItems='center'
-            height='calc(100vh - 390px)'
-          >
-            <Typography>No categories found.</Typography>
-          </Stack>
-        )}
+                        sx={{
+                          px: [0, 0, 2],
+                          bgcolor:
+                            selectCate === e.cate_id ? 'background.paper' : '',
+                          color: selectCate === e.cate_id ? 'primary.main' : '',
+                        }}
+                      >
+                        <ListItemText
+                          primary={e.name}
+                          primaryTypographyProps={{
+                            noWrap: true,
+                            sx: { maxWidth: '90%' },
+                          }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Box>
+                ))}
+            </Box>
+          ) : (
+            <Stack
+              justifyContent='center'
+              alignItems='center'
+              height='calc(100vh - 390px)'
+            >
+              <Typography>No categories found.</Typography>
+            </Stack>
+          )}
+        </Box>
       </Box>
 
       <Menu
