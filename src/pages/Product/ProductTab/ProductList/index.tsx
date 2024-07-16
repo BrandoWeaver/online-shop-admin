@@ -124,7 +124,7 @@ const ProductList = ({
         />
       </Box>
 
-      <Box mt={2} sx={{ height: 'calc(100vh - 380px)' }}>
+      <Box mt={2} sx={{ height: 'calc(100vh - 380px)', overflow: 'scroll' }}>
         {loadingProductList ? (
           <Stack
             justifyContent='center'
