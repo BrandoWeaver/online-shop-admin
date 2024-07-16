@@ -34,11 +34,11 @@ const ProductDetail = ({
   selectPro,
   setSelectPro,
   edit,
-  setEdit,
   productToUpdate,
   refreshProduct,
 }: IProductDetail) => {
   const [active, setActive] = useState(0);
+
   return (
     <>
       <Box sx={{ px: [0, 0, 2], top: 0 }}>
@@ -73,29 +73,6 @@ const ProductDetail = ({
       {active === 0 && (
         <>
           <Box sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-            {/* {edit ? (
-              <FormProvider {...methods}>
-                <form onSubmit={methods.handleSubmit(onSubmit)}>
-                  <ProductForm {...{ allCategory }} />
-                </form>
-              </FormProvider>
-            ) : (
-              <DetailView
-                {...{
-                  data: productDetail
-                    ? {
-                        ...productDetail,
-                        categoryName: allCategory?.find(
-                          (cate) => cate.id === productDetail?.categoryId,
-                        )?.name,
-                      }
-                    : undefined,
-                  loading: loadingGetProDetail,
-                  refresh: refreshProDetail,
-                  error: errGetProDetail,
-                }}
-              />
-            )} */}
             {selectPro === 'new' || edit ? (
               <CreateProductForm
                 setSelectPro={setSelectPro}
@@ -107,117 +84,8 @@ const ProductDetail = ({
               <ProductDetailPage {...productToUpdate} />
             )}
           </Box>
-          {/* <Stack direction='row' justifyContent='center' spacing={2} my={2}>
-            {!edit ? (
-              <Button
-                variant='contained'
-                color='inherit'
-                sx={{ minWidth: 100 }}
-                onClick={() => setEdit(true)}
-              >
-                Edit
-              </Button>
-            ) : (
-              <>
-                <Button onClick={onCancelClick} sx={{ minWidth: 100 }}>
-                  Cancel
-                </Button>
-                <Button
-                  onClick={methods.handleSubmit(onSubmit)}
-                  variant='contained'
-                  sx={{ minWidth: 100 }}
-                >
-                  Save
-                </Button>
-              </>
-            )}
-          </Stack> */}
         </>
       )}
-
-      {/* {active === 1 && (
-        <>
-         
-            <VariantsView
-              edit={edit}
-              proId={selectPro}
-              shopId={1}
-              basePrice={+productDetail?.afterDiscount}
-              onEditClick={() => setEdit(true)}
-              onCancelClick={() => setEdit(false)}
-            />
-          
-        </>
-      )} */}
-
-      {/* <Box sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-        <TabPanel value={active} index={0}>
-          {edit ? (
-            <FormProvider {...methods}>
-              <form onSubmit={methods.handleSubmit(onSubmit)}>
-                <ProductForm {...{ allCategory }} />
-              </form>
-            </FormProvider>
-          ) : (
-            <DetailView
-              {...{
-                data: productDetail
-                  ? {
-                      ...productDetail,
-                      categoryName: allCategory?.find(
-                        (cate) => cate.id === productDetail?.categoryId
-                      )?.name,
-                    }
-                  : undefined,
-                loading: loadingGetProDetail,
-                refresh: refreshProDetail,
-                error: errGetProDetail,
-              }}
-            />
-          )}
-        </TabPanel>
-        <TabPanel value={active} index={1}>
-          {selectedShop && selectPro !== 'new' && productDetail && (
-            <VariantsView
-              edit={edit}
-              proId={selectPro}
-              shopId={1}
-              basePrice={+productDetail?.afterDiscount}
-            />
-          )}
-        </TabPanel>
-      </Box>
-
-      <Stack direction='row' justifyContent='center' spacing={2} my={2}>
-        {!edit ? (
-          <Button
-            variant='contained'
-            color='inherit'
-            sx={{ minWidth: 100 }}
-            onClick={() => setEdit(true)}
-          >
-            Edit
-          </Button>
-        ) : (
-          <>
-            <Button
-              onClick={onCancelClick}
-              disabled={isLoading}
-              sx={{ minWidth: 100 }}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={methods.handleSubmit(onSubmit)}
-              variant='contained'
-              disabled={isLoading}
-              sx={{ minWidth: 100 }}
-            >
-              Save
-            </Button>
-          </>
-        )}
-      </Stack> */}
     </>
   );
 };

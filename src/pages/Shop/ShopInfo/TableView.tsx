@@ -129,30 +129,6 @@ export default function CustomizedTables() {
             </StyledTableRow>
           ))}
         </TableBody>
-        {/* <TableBody>
-          {row5.map((row) => (
-            <StyledTableRow key={row.label}>
-              <StyledTableCell
-                component='th'
-                scope='row'
-                sx={{
-                  fontSize: { xs: 'body2.fontSize', md: 'body1.fontSize' },
-                }}
-              >
-                {row.label}
-              </StyledTableCell>
-              <StyledTableCell
-                align='left'
-                sx={{
-                  px: 0,
-                  fontSize: { xs: 'body2.fontSize', md: 'body1.fontSize' },
-                }}
-              >
-                {row.data}
-              </StyledTableCell>
-            </StyledTableRow>
-          ))}
-        </TableBody> */}
         <TableHead>
           <TableRow>
             <StyledTableCell

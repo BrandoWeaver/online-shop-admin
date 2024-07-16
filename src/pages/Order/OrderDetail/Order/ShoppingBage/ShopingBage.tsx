@@ -10,26 +10,12 @@ interface Ishop {
   detailId: string | undefined;
   refDetail: () => void;
   setEditId: React.Dispatch<React.SetStateAction<number | '' | undefined>>;
-  runDeleteProduct: (data: any) => void;
   listLoading: boolean;
-  loadDeleteProduct: boolean;
 }
 function ShopingBage(props: Ishop) {
   return (
     <Box mt={2}>
       <Grid item xs={12}>
-        {/* <Selectvariants
-          open={open}
-          id={proId}
-          onClose={() => setOpen(false)}
-          productDetail={props.orderDetails?.filter(
-            (el: any) => el.productId === proId,
-          )}
-          productId={props.editId}
-          close={setOpen}
-          setId={props.setEditId}
-          refDetail={props.refDetail}
-        /> */}
         <Typography
           fontWeight={'bold'}
           sx={{

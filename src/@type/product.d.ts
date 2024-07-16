@@ -197,7 +197,7 @@ declare namespace IProduct {
     description: string;
     price: string;
     quantity: string;
-    image: File | null;
+    image: File | string;
     status: string;
     cate_id: string;
   }

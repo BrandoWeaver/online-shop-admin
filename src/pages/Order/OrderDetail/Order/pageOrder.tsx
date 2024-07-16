@@ -9,9 +9,6 @@ import ORDER from 'api/Order';
 import { IErrDialogRef } from 'components/Dialog/ErrDialog';
 import ErrDialog from 'components/Dialog/ErrDialog';
 
-import HttpUtil from 'utils/http-util';
-import { ROUTE_API } from 'utils/route-util';
-
 import ConfrimBtn from './BtnBystatus/ConfirmBtn';
 import PendingBtn from './BtnBystatus/PendingBtn';
 import Customer from './Customer/Customer';
@@ -65,23 +62,6 @@ function OrderPage(props: Iorder) {
   const [editId, setEditId] = useState<number | ''>();
   const [cancel, setCancel] = useState(false);
 
-  const { run: runDeleteProduct, loading: loadDeleteProduct } = useRequest(
-    (data) =>
-      HttpUtil.post(
-        ROUTE_API.deleteOrderProduct
-          .replace(':id', `${1}`)
-          .replace(':orderDetailId', data),
-      ),
-    {
-      manual: true,
-      onSuccess: () => {
-        props.refDetail();
-      },
-      onError: (e) => {
-        errRef.current?.open(e);
-      },
-    },
-  );
   const {
     data: orderDetail,
     loading: listDetailLoading,
@@ -197,12 +177,10 @@ function OrderPage(props: Iorder) {
           <ShopingBage
             editId={editId}
             setEditId={setEditId}
-            runDeleteProduct={runDeleteProduct}
             detailId={props.detailId}
             orderDetails={orderDetail}
             refDetail={props.refDetail}
             listLoading={props.loading}
-            loadDeleteProduct={loadDeleteProduct}
           />
           <PaymentMethod
             afterDiscount={props.afterDiscount}

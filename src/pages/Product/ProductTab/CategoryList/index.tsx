@@ -39,21 +39,13 @@ interface ICategories {
   shopId?: number;
   selectCate: string | 'all';
   setSelectCate: React.Dispatch<React.SetStateAction<string | 'all'>>;
-  setSelectPro: React.Dispatch<React.SetStateAction<string | 'new'>>;
-  loadingListCate: boolean;
-  errListCate?: Error;
-  refreshListCate: () => void;
   disableAdd: boolean;
 }
 
 const Categories = ({
   shopId,
-  loadingListCate,
-  errListCate,
-  refreshListCate,
   selectCate,
   setSelectCate,
-  setSelectPro,
   disableAdd,
 }: ICategories) => {
   const deleteAlert = useRef<IConfDialogRef>(null);
@@ -105,7 +97,7 @@ const Categories = ({
     },
   );
 
-  const { run: runDeleteCategory, loading: loadingDeleteCategory } = useRequest(
+  const { run: runDeleteCategory } = useRequest(
     () => CategoryAPI.deleteCategory(selectCate),
     {
       manual: true,
@@ -123,18 +115,7 @@ const Categories = ({
   }, [selectCate]);
   return (
     <>
-      {/* <BackdropLoading
-        open={
-          loadingAddCategory ||
-          loadingDeleteCategory ||
-          loadingListCate ||
-          loadingEditCategory ||
-          loadingCategory
-        }
-      /> */}
-
       <ErrDialog ref={errAlert} />
-
       <ConfDialog
         ref={deleteAlert}
         onConfirm={(data) => {
@@ -143,7 +124,6 @@ const Categories = ({
           deleteAlert.current?.close();
         }}
       />
-
       <CusDialog ref={cateFormRef}>
         <CategoryForm
           cateToUpdate={cateToUpdate}

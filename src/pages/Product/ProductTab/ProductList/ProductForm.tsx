@@ -1,5 +1,5 @@
 import { useRequest } from 'ahooks';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 import {
@@ -27,7 +27,7 @@ interface ProductFormData {
   description: string;
   price: string;
   quantity: string;
-  image: File | null;
+  image: File | string;
   status: string;
   cate_id: string;
 }
@@ -66,10 +66,10 @@ const CreateProductForm = (props: createProps) => {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<ProductFormData>();
 
   const onSubmit: SubmitHandler<ProductFormData> = (data) => {
-    // Handle form submission with typed data
     console.log('editdata', data);
     if (props.productToUpdate) {
       runEditProduct(props.proId, data);
@@ -88,7 +88,18 @@ const CreateProductForm = (props: createProps) => {
       reader.readAsDataURL(file);
     }
   };
-
+  useEffect(() => {
+    if (props.proId === 'new') {
+      setImagePreview('');
+      setValue('cate_id', '');
+      setValue('description', '');
+      setValue('image', '');
+      setValue('name', '');
+      setValue('price', '');
+      setValue('quantity', '');
+      setValue('status', '');
+    }
+  }, [props.proId]);
   return (
     <Container maxWidth='sm'>
       <ErrDialog ref={errAlert} />
@@ -118,7 +129,7 @@ const CreateProductForm = (props: createProps) => {
               <Controller
                 name='image'
                 control={control}
-                defaultValue={null}
+                defaultValue={''}
                 render={({
                   field: { onChange, value },
                   fieldState: { error },

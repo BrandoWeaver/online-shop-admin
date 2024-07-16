@@ -35,6 +35,7 @@ const ProductTab = () => {
     onError: (err) => {
       errRef.current?.open(err);
     },
+
     cacheKey: `get-shop-${1}-categories`,
     refreshDeps: [selectCate],
   });
@@ -50,17 +51,23 @@ const ProductTab = () => {
     loading: loadingProductList,
     data: allListProduct,
     refresh: refreshProduct,
+    run: runProductList,
   } = useRequest(() => PRODUCT_API.listProducts(selectCate, debouncedText), {
     onSuccess: (data) => {
       console.log('SuccessResListProduct', data);
     },
+    ready: selectCate !== 'new',
     onError: (err) => {
       console.log('errRes', err);
       errRef.current?.open(err);
     },
     refreshDeps: [selectCate, debouncedText],
   });
-
+  useEffect(() => {
+    if (selectCate !== 'new') {
+      runProductList();
+    }
+  }, [selectCate]);
   return (
     <Grid
       container
@@ -120,7 +127,7 @@ const ProductTab = () => {
           overflow: 'scroll',
         }}
       >
-        {selectCate !== '' && (
+        {selectCate !== '' && selectCate !== 'new' && (
           <ProductList
             {...{
               shopId: 1,
@@ -193,7 +200,7 @@ const ProductTab = () => {
           height: 'inherit',
         }}
       >
-        {selectPro !== '' && (
+        {selectPro !== '' && selectCate !== 'new' && (
           <ProductDetail
             {...{
               selectCate,

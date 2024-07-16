@@ -1,4 +1,3 @@
-import { useRequest } from 'ahooks';
 import { useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { MdPermIdentity } from 'react-icons/md';
@@ -6,52 +5,14 @@ import { MdPermIdentity } from 'react-icons/md';
 import { Alert, Box, Button, Snackbar, Typography } from '@mui/material';
 
 import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
-import ErrorDialog from 'components/Dialog/ErrorDialog';
-import { BackdropLoading } from 'components/Loading';
-
-import HttpUtil from 'utils/http-util';
-import { ROUTE_API } from 'utils/route-util';
 
 import { IformAcc } from './form';
 
 const Account = () => {
-  const [errOpen, setOpenErr] = useState(false);
   const [succOpen, setOpenSucc] = useState(false);
   const [accOpen, setaccOpen] = useState(false);
   const method = useForm<IformAcc>();
   const errRef = useRef<IErrDialogRef>(null);
-  const {
-    error: errUpdatePass,
-
-    loading: loadPass,
-  } = useRequest(
-    (oldPass, newPass) =>
-      HttpUtil.post(ROUTE_API.changePassword, {
-        oldPassword: oldPass,
-        newPassword: newPass,
-      }),
-    {
-      manual: true,
-      onError: () => {
-        errRef.current?.open('Error Occured');
-      },
-      onSuccess: () => {
-        setOpenSucc(true);
-      },
-    },
-  );
-  const { error: errInfo, loading: loadInfo } = useRequest(
-    async (data) => HttpUtil.post(ROUTE_API.editSellerInfo, data),
-    {
-      manual: true,
-      onError: (err) => {
-        errRef.current?.open('Error Occured');
-      },
-      onSuccess: () => {
-        setaccOpen(true);
-      },
-    },
-  );
 
   const onSubmit: SubmitHandler<IformAcc> = async (data) => {
     console.log('Data', data);
@@ -59,16 +20,6 @@ const Account = () => {
     formData.append('name', data.name);
     formData.append('email', data.email);
     formData.append('username', data.userName);
-
-    // if (
-    //   getValues("name") !== sellerInfo?.userInfo.name ||
-    //   getValues("email") !== sellerInfo?.userInfo.email ||
-    //   getValues("userName") !== sellerInfo.username
-    // ) {
-    //   await runUpdateInfo(formData);
-    // } else {
-    //   run(getValues("oldPass"), getValues("newPass"));
-    // }
   };
 
   return (
@@ -111,35 +62,7 @@ const Account = () => {
           Your Password has been changed
         </Alert>
       </Snackbar>
-      {loadInfo || loadPass ? (
-        <BackdropLoading open />
-      ) : errInfo ? (
-        <>
-          <ErrorDialog
-            errorTitle='Error Occured'
-            open={errOpen}
-            errorMessage={
-              errInfo?.message || errInfo?.error || errInfo?.error_description
-            }
-            onCloseDialog={() => setOpenErr(false)}
-          />
-        </>
-      ) : (
-        errUpdatePass && (
-          <>
-            <ErrorDialog
-              errorTitle='Error Occured'
-              open={errOpen}
-              errorMessage={
-                errUpdatePass?.error ||
-                errUpdatePass?.message ||
-                errUpdatePass?.error_description
-              }
-              onCloseDialog={() => setOpenErr(false)}
-            />
-          </>
-        )
-      )}
+
       <Box
         sx={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}
       >
@@ -148,12 +71,6 @@ const Account = () => {
           Account Setting
         </Typography>
       </Box>
-      {/* <Box sx={{ px: 3, pt: 3 }}>
-        <FormProvider {...method}>
-          <Accform sellerInfo={sellerInfo} />
-        </FormProvider>
-      </Box> */}
-
       <Box
         sx={{
           display: 'flex',
