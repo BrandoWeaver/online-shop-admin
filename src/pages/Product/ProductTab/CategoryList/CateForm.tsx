@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { MdPhotoCamera } from 'react-icons/md';
 
@@ -44,7 +44,7 @@ const CategoryForm = ({
   loading: boolean;
   cateToUpdate: IProduct.Category | undefined;
 }) => {
-  const { control, handleSubmit } = useForm<IAddCategoryForm>();
+  const { control, handleSubmit, setValue } = useForm<IAddCategoryForm>();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const onSubmit: SubmitHandler<IAddCategoryForm> = (data) => {
@@ -70,7 +70,12 @@ const CategoryForm = ({
   };
 
   console.log('infoorm', cateToUpdate);
-
+  useEffect(() => {
+    if (cateId === 'new') {
+      setValue('image', null);
+      setValue('name', '');
+    }
+  }, [cateId]);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack py={2} px={3}>

@@ -1,5 +1,5 @@
 import { useDebounce, useRequest } from 'ahooks';
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import {
   MdDelete,
@@ -120,6 +120,12 @@ const Categories = ({
   );
 
   console.log('param index', cateToUpdate);
+  useEffect(() => {
+    if (selectCate === 'new') {
+      setCateToUpdate(undefined);
+      setSearchText('');
+    }
+  }, [selectCate]);
   return (
     <>
       {/* <BackdropLoading
@@ -297,7 +303,10 @@ const Categories = ({
         <Button
           variant='contained'
           disabled={disableAdd}
-          onClick={() => cateFormRef.current?.open()}
+          onClick={() => {
+            setSelectCate('new');
+            cateFormRef.current?.open();
+          }}
         >
           Add Category
         </Button>
