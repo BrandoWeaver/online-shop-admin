@@ -103,6 +103,7 @@ declare namespace Iorder {
     items: Item[];
     totalPrice: number;
     createdAt: string;
+    address?: string;
     __v: number;
   }
 

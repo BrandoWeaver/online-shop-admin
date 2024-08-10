@@ -122,7 +122,7 @@ function OrderPage(props: Iorder) {
           <Customer
             customerContact={orderDetail?.phoneNumber}
             customerName={orderDetail?.userName}
-            zone={'NA'}
+            zone={orderDetail?.address || 'NA'}
           />
           {props.status === 'delivering' ? (
             <Driver
@@ -148,10 +148,12 @@ function OrderPage(props: Iorder) {
               <GoogleMap
                 mapContainerStyle={containerStyle}
                 center={
-                  {
-                    lat: orderDetail?.lat || -1,
-                    lng: orderDetail?.lng || -1,
-                  } || defaultCoord
+                  orderDetail
+                    ? {
+                        lat: orderDetail.lat || -1,
+                        lng: orderDetail.lng || -1,
+                      }
+                    : defaultCoord
                 }
                 zoom={17}
                 options={{
@@ -165,10 +167,12 @@ function OrderPage(props: Iorder) {
               >
                 <Marker
                   position={
-                    {
-                      lat: orderDetail?.lat || -1,
-                      lng: orderDetail?.lng || -1,
-                    } || defaultCoord
+                    orderDetail
+                      ? {
+                          lat: orderDetail.lat || -1,
+                          lng: orderDetail.lng || -1,
+                        }
+                      : defaultCoord
                   }
                 />
               </GoogleMap>
