@@ -119,7 +119,6 @@ const Order = () => {
       errRef.current?.open('Error Occured');
     },
     refreshDeps: [orderStatus],
-    pollingInterval: 5000,
   });
 
   const {
