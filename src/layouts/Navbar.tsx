@@ -39,7 +39,7 @@ interface Props {
 function Navbar({ drawerWidth }: Props) {
   // console.log("Navbar");
   const { pathname } = useLocation();
-  const { setAuthState } = useAuthContext();
+  const { setAuthState, authState } = useAuthContext();
   const [open, setOpen] = useState(false);
 
   const logoutRef = useRef<IConfDialogRef>(null);
@@ -57,7 +57,7 @@ function Navbar({ drawerWidth }: Props) {
       onSuccess: (data) => {
         console.log('data', data);
       },
-      pollingInterval: 5000,
+      ready: authState.authed,
     },
   );
   return (

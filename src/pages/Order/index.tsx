@@ -83,6 +83,8 @@ const Order = () => {
     refresh: refDetail,
     error: errListDetail,
   } = useRequest(() => ORDER.getOrderInfo(`${orderId}`), {
+    manual: true,
+    ready: orderId !== '',
     onSuccess: (data) => {
       console.log('orderDetail:');
     },
