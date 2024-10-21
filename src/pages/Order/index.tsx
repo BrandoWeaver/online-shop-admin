@@ -128,16 +128,19 @@ const Order = () => {
     loading: loadListHistory,
     error: errListHistory,
     refresh: refreshListHistory,
-  } = useRequest(() => ORDER.getListHistoryOrder(ordreHistoryStatus), {
-    onSuccess: (data) => {
-      setPickDate(false);
-      console.log('history', data);
+  } = useRequest(
+    () => ORDER.getListHistoryOrder(ordreHistoryStatus, startDate, endDate),
+    {
+      onSuccess: (data) => {
+        setPickDate(false);
+        console.log('history', data);
+      },
+      onError: (err) => {
+        errRef.current?.open('Error Occured');
+      },
+      refreshDeps: [startDate, endDate, orderStatus],
     },
-    onError: (err) => {
-      errRef.current?.open('Error Occured');
-    },
-    refreshDeps: [startDate, endDate, orderStatus],
-  });
+  );
   const { data: dataHistory, loading: loadingBystatus } = useRequest(
     () => ORDER.SummaryOrder(startDate, endDate),
     {
@@ -479,6 +482,14 @@ const Order = () => {
                       >
                         <CircularProgress size={16} />
                       </Box>
+                    ) : listHistory?.orders.length === 0 ? (
+                      <Box>
+                        <NodataMessageHistory
+                          data={1}
+                          height='calc(100vh - 450px)'
+                          status={historyOrderStatus[history].value}
+                        />
+                      </Box>
                     ) : errListHistory ? (
                       <ErrorResponse
                         message={
@@ -490,14 +501,6 @@ const Order = () => {
                         buttonAction={refreshListHistory}
                         height='calc(100vh - 450px)'
                       />
-                    ) : listHistory?.orders.length === 0 ? (
-                      <Box>
-                        <NodataMessageHistory
-                          data={1}
-                          height='calc(100vh - 450px)'
-                          status={historyOrderStatus[history].value}
-                        />
-                      </Box>
                     ) : (
                       listHistory?.orders.map((el) => {
                         return (

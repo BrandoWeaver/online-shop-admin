@@ -42,10 +42,16 @@ const ORDER = {
     return res.data;
   },
 
-  getListHistoryOrder: async (status: string) => {
+  getListHistoryOrder: async (
+    status: string,
+    startDate: string,
+    endDate: string,
+  ) => {
     const res = await HttpUtil.get<Iorder.IhistoryOrder>(ROUTE_API.history, {
       params: {
-        status,
+        status: status,
+        startDate: startDate,
+        endDate: endDate,
       },
     });
     return res.data;
