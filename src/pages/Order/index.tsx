@@ -28,6 +28,7 @@ import FullScreenDialog from 'components/Dialog/FullDialog';
 
 import theme from 'themes';
 
+import NodataMessage from './OrderDetail/MessageComponent/NodataMessageActive';
 import NodataMessageHistory from './OrderDetail/MessageComponent/NodataMessageHistory';
 import ListOrder from './OrderDetail/Order/ListOrder/ListOrder';
 import StepButton from './OrderDetail/Order/StepButton';
@@ -344,12 +345,11 @@ const Order = () => {
                         justifyContent={'center'}
                         alignItems={'center'}
                       >
-                        {/* <NodataMessage
-                            data={curentListOrder.length}
-                            height='calc(100vh - 270px)'
-                            status={activeOrderStatus[active].label}
-                          /> */}
-                        <Typography>No Data</Typography>
+                        <NodataMessage
+                          data={listOrder?.orders.length}
+                          height='calc(100vh - 270px)'
+                          status={activeOrderStatus[active].value}
+                        />
                       </Box>
                     ) : (
                       listOrder?.orders?.map((el, index) => {
@@ -485,7 +485,7 @@ const Order = () => {
                     ) : listHistory?.orders.length === 0 ? (
                       <Box>
                         <NodataMessageHistory
-                          data={1}
+                          data={0}
                           height='calc(100vh - 450px)'
                           status={historyOrderStatus[history].value}
                         />

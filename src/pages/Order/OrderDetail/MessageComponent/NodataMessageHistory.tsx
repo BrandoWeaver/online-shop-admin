@@ -17,7 +17,7 @@ function NodataMessageHistory(props: InodataMessage) {
         height: props.height,
       }}
     >
-      {props.data === 0 && props.status === 'completed,cancelled' ? (
+      {props.data === 0 && props.status === '' ? (
         <Typography>No history order</Typography>
       ) : props.data === 0 && props.status === 'completed' ? (
         <Typography>No completed order</Typography>
