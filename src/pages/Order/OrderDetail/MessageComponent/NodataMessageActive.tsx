@@ -27,8 +27,8 @@ function NodataMessage(props: InodataMessage) {
         <Typography>No waiting driver</Typography>
       ) : (
         props.data === 0 &&
-        props.status === 'delivering,delivering_province' && (
-          <Typography>No delivery</Typography>
+        props.status === 'processing,delivering_province' && (
+          <Typography>No processing order</Typography>
         )
       )}
     </Box>

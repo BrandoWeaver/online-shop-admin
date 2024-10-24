@@ -113,7 +113,7 @@ function OrderPage(props: Iorder) {
           </Stack>
         </>
       ) : (
-        <Grid container>
+        <Box>
           <TopCom
             detailId={props.detailId}
             status={orderDetail?.status}
@@ -219,7 +219,7 @@ function OrderPage(props: Iorder) {
               />
             )
           )}
-        </Grid>
+        </Box>
       )}
       <DialogCancel
         setOrder={props.setOrder}

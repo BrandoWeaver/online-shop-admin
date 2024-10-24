@@ -236,14 +236,14 @@ function ShopingBage(props: Ishop) {
                       alignItems: 'center',
                     }}
                   >
-                    <div
+                    {/* <div
                       style={{
                         height: '50px',
                         width: '1px',
                         background: theme.palette.grey['300'],
                         marginRight: '10px',
                       }}
-                    ></div>
+                    ></div> */}
                     <Box
                       sx={{
                         display: 'flex',

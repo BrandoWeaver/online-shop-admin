@@ -7,6 +7,7 @@ import ORDER from 'api/Order';
 import SHOP_PERFORMANCE from 'api/ShopPerformance';
 
 import ErrDialog, { IErrDialogRef } from 'components/Dialog/ErrDialog';
+import { BackdropLoading } from 'components/Loading';
 
 const DashboardItem = ({
   title,
@@ -53,7 +54,7 @@ const DashboardItem = ({
 
 const Home = () => {
   const errRef = useRef<IErrDialogRef>(null);
-  const { data: dataShopPerformance } = useRequest(
+  const { data: dataShopPerformance, loading: loadinggPerformace } = useRequest(
     SHOP_PERFORMANCE.shopPerformance,
     {
       onSuccess: (data) => {
@@ -64,15 +65,20 @@ const Home = () => {
       },
     },
   );
-  const { data: dataOrderActive } = useRequest(ORDER.getOrderActive, {
-    onSuccess: (data) => {
-      console.log('data', data);
+  const { data: dataOrderActive, loading: loadingOrderActive } = useRequest(
+    ORDER.getOrderActive,
+    {
+      onSuccess: (data) => {
+        console.log('data', data);
+      },
+      onError: () => {
+        errRef.current?.open('Error Occured');
+      },
     },
-    onError: () => {
-      errRef.current?.open('Error Occured');
-    },
-  });
-
+  );
+  if (loadingOrderActive && loadinggPerformace) {
+    return <BackdropLoading open />;
+  }
   return (
     <Grid container spacing={2} sx={{ p: [2, 2, 3] }}>
       <ErrDialog ref={errRef} />

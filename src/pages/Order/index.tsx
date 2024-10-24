@@ -38,7 +38,7 @@ import DataHistory from './OrderSumary/History';
 
 const activeOrderStatus = [
   { label: 'Pending', value: 'pending' },
-  { label: 'Delivering', value: 'processing' },
+  { label: 'processing', value: 'processing' },
   { label: 'Confirmed', value: 'completed' },
 ];
 const historyOrderStatus = [
@@ -327,6 +327,15 @@ const Order = () => {
                       >
                         <CircularProgress size={25} />
                       </Box>
+                    ) : listOrder?.totalPages === 0 ? (
+                      <Box
+                        height='calc(100vh - 270px)'
+                        display={'flex'}
+                        justifyContent={'center'}
+                        alignItems={'center'}
+                      >
+                        <Box>No Data</Box>
+                      </Box>
                     ) : errListorder ? (
                       <ErrorResponse
                         message={
@@ -338,19 +347,6 @@ const Order = () => {
                         buttonAction={refreshListOrder}
                         height='calc(100vh - 270px)'
                       />
-                    ) : listOrder?.orders.length === 0 ? (
-                      <Box
-                        height='calc(100vh - 270px)'
-                        display={'flex'}
-                        justifyContent={'center'}
-                        alignItems={'center'}
-                      >
-                        <NodataMessage
-                          data={listOrder?.orders.length}
-                          height='calc(100vh - 270px)'
-                          status={activeOrderStatus[active].value}
-                        />
-                      </Box>
                     ) : (
                       listOrder?.orders?.map((el, index) => {
                         return (
